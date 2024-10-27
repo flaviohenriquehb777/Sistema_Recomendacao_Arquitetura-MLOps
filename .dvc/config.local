@@ -1,0 +1,4 @@
+['remote "dagshub"']
+    auth = basic
+    user = flaviohenriquehb777
+    ask_password = false
