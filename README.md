@@ -30,4 +30,7 @@ O arquivos final inicia importando a base no formato parquet e os passos que se 
 - Criar um DataFrame para exibir as recomendações;
 - Função para determinar as melhores 7 recomendações para o cliente escolhido;
 - Utilizando a função 'recomendar_produtos';
-- Utilizando a função (Nesse momento utilizei o cliente "Darrin Van Huff" como exemplo).
+- Utilizando a função (Nesse momento utilizei o cliente "Darrin Van Huff" como exemplo).<br><br>
+
+### OBSERVAÇÃO:
+A função 'recomendar_produtos', que se encontra ao final no notebook, permite que novos clientes, ou seja, clientes que não façam parte da base de dados original, também tenham suas recomendações dos 07 (sete) melhores produtos contempladas.
