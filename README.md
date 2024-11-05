@@ -7,7 +7,7 @@ Utilizando o TensorFlow desenvolvi um modelo que foi treinado, a partir de uma b
 No modelo estão os 07 (sete) melhores produtos que podem ser recomendados para o consumidor de nome 'Darrin Van Huff'.<br>
 Porém, como eu criei uma função para gerar essa tabela final com as recomendações para o consumidor, o mesmo pode ser substituído por qualquer outro. Assim podemos ter as melhores recomendações para qualquer cliente que desejarmos.<br><br>
 
-No arquivo inicial, foi feita uma análize exploratória e, com isso, vi a necessidade de algumas correções na base:<br>
+No arquivo inicial, foi feita uma análise exploratória e, com isso, vi a necessidade de algumas correções na base:<br>
 - Eliminação dos valores nulos;
 - Correção de alguns tipo (pypes) de dados;
 - Foi feito o downcast dos dados;
