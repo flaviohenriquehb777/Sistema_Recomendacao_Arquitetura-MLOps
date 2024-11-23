@@ -1,5 +1,5 @@
-# Sistema de Recomendação (Sam's Club - Walmart)
-**Sistema de recomendação de produtos para consumidores**
+# Sistema de Recomendações (Sam's Club - Walmart)
+**Sistema de recomendações de produtos para consumidores do Sam's Club - Walmart**
 
 ## DESCRIÇÃO:
 
