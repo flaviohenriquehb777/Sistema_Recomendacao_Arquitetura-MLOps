@@ -3,7 +3,7 @@
 
 ## DESCRIÇÃO:
 
-Este modelo apresenta a implementação de um sistema de recomendação baseado em técnicas de Deep Learning, utilizando bibliotecas como TensorFlow e Keras para desenvolver um modelo treinado a partir de uma base de dados, que ao final lista os 07 (sete) melhores produtos recomendados ao consumidor. <br> 
+Este modelo apresenta a implementação de um sistema de recomendação baseado em técnicas de Deep Learning, utilizando TensorFlow (Keras) para desenvolver um modelo treinado a partir de uma base de dados, que ao final lista os 07 (sete) melhores produtos recomendados ao consumidor. <br> 
 No modelo, estão os 07 (sete) melhores produtos recomendados ao consumidor de nome 'Darrin Van Huff'. <br> 
 Porém, como criei uma função para gerar esta tabela final com as recomendações para o consumidor, este pode ser substituído por qualquer outro. Assim, podemos ter as melhores recomendações para qualquer cliente que desejarmos..<br><br>
 
@@ -17,8 +17,7 @@ No arquivo inicial, foi feita uma análise exploratória e, com isso, vi a neces
 - Python;
 - Pandas;
 - Numpy;
-- TensorFlow;
-- Keras.<br><br>
+- TensorFlow (Keras).<br><br>
 
 O arquivos final inicia importando a base no formato parquet e os passos que se seguem são os seguintes:
 - Filtrar colunas relevantes;
