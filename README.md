@@ -3,9 +3,8 @@
 
 ## DESCRIÇÃO:
 
-Este modelo apresenta a implementação de um sistema de recomendação baseado em técnicas de Deep Learning, utilizando TensorFlow (Keras) para desenvolver um modelo treinado a partir de uma base de dados, que ao final lista os 07 (sete) melhores produtos recomendados ao consumidor. <br> 
-No modelo, estão os 07 (sete) melhores produtos recomendados ao consumidor de nome 'Darrin Van Huff'. <br> 
-Porém, como criei uma função para gerar esta tabela final com as recomendações para o consumidor, este pode ser substituído por qualquer outro. Assim, podemos ter as melhores recomendações para qualquer cliente que desejarmos..<br><br>
+Este modelo implementa um sistema de recomendação baseado em técnicas de Deep Learning, utilizando TensorFlow (Keras) para treinar um modelo com uma base de dados. O sistema gera, ao final, uma lista dos 07 (sete) melhores produtos recomendados para o consumidor.
+No exemplo apresentado, os 07 (sete) produtos recomendados são para o cliente 'Darrin Van Huff'. No entanto, desenvolvi uma função que possibilita a criação dessa tabela final de recomendações para qualquer consumidor. Assim, é possível obter as melhores recomendações personalizadas para qualquer cliente desejado.<br><br>
 
 No arquivo inicial, foi feita uma análise exploratória e, com isso, vi a necessidade de algumas correções na base:<br>
 - Eliminação dos valores nulos;
@@ -39,4 +38,4 @@ O arquivos final inicia importando a base no formato parquet e os passos que se 
 - Utilizando a função (Nesse momento utilizei o cliente "Darrin Van Huff" como exemplo).<br><br>
 
 ### OBSERVAÇÃO:
-A função 'recomendar_produtos', que se encontra ao final no notebook, permite que novos clientes, ou seja, clientes que não façam parte da base de dados original, também tenham suas recomendações dos 07 (sete) melhores produtos contempladas.
+A função 'recomendar_produtos', desenvolvida por mim e presente no notebook final, possibilita que novos clientes, ou seja, aqueles que não integram a base de dados original, também recebam recomendações dos 07 (sete) melhores produtos.
