@@ -16,7 +16,8 @@ No arquivo inicial, foi feita uma análise exploratória e, com isso, vi a neces
 - Python;
 - Pandas;
 - Numpy;
-- TensorFlow (Keras).<br><br>
+- TensorFlow (Keras);
+- SHAP.<br><br>
 
 O arquivos final inicia importando a base no formato parquet e os passos que se seguem são os seguintes:
 - Filtrar colunas relevantes;
