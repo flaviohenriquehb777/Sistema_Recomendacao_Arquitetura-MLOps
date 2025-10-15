@@ -238,11 +238,13 @@ def rewrite_git_history():
         # Adicionar todos os arquivos
         run_command("git add .")
         
-        # Fazer commit com data específica
+        # Fazer commit com data específica usando PowerShell
         commit_date = f"{new_date} 10:00:00"
-        env_vars = f'GIT_AUTHOR_DATE="{commit_date}" GIT_COMMITTER_DATE="{commit_date}"'
         
-        stdout, stderr = run_command(f'{env_vars} git commit -m "{new_message}"', check=False)
+        # Usar PowerShell para definir variáveis de ambiente
+        ps_command = f'$env:GIT_AUTHOR_DATE="{commit_date}"; $env:GIT_COMMITTER_DATE="{commit_date}"; git commit -m "{new_message}"'
+        
+        stdout, stderr = run_command(f'powershell -Command "{ps_command}"', check=False)
         
         if stderr and "nothing to commit" not in stderr:
             print(f"Aviso no commit: {stderr}")
