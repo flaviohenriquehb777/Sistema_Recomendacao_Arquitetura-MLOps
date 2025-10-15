@@ -1,0 +1,34 @@
+stages:
+  data_preparation:
+    cmd: python src/scripts/otimizacao_modelo_simples.py
+    deps:
+    - src/scripts/otimizacao_modelo_simples.py
+    - dados/sc_base_01/sc_base_01_bruto.csv
+    outs:
+    - dados/dados_tratados.parquet
+    
+  model_training:
+    cmd: python src/scripts/otimizacao_modelo.py
+    deps:
+    - src/scripts/otimizacao_modelo.py
+    - dados/dados_tratados.parquet
+    outs:
+    - models/best_model_recomendacao_otimizado.keras
+    - models/category_encoder_otimizado.pkl
+    - models/customer_encoder_otimizado.pkl
+    - models/product_encoder_otimizado.pkl
+    - models/sales_scaler_otimizado.pkl
+    - models/subcategory_encoder_otimizado.pkl
+    
+  ensemble_training:
+    cmd: python src/scripts/modelo_ensemble.py
+    deps:
+    - src/scripts/modelo_ensemble.py
+    - models/best_model_recomendacao_otimizado.keras
+    - models/category_encoder_otimizado.pkl
+    - models/customer_encoder_otimizado.pkl
+    - models/product_encoder_otimizado.pkl
+    - models/sales_scaler_otimizado.pkl
+    - models/subcategory_encoder_otimizado.pkl
+    outs:
+    - models/ensemble/

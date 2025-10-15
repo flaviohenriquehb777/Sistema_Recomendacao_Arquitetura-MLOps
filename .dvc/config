@@ -1,0 +1,8 @@
+[core]
+    remote = dagshub
+['remote "myremote"']
+    url = gdrive://1Nt_zyNnqnGZZbKhQFGTfvI9rzZ9IPGCJ
+['remote "dagshub"']
+    url = https://dagshub.com/flaviohenriquehb777/Projeto_7_Sistema_de_Recomendacao.dvc
+    user = flaviohenriquehb777
+    password = 8cbd6c6ed2246614de40703cb82d54a4777b0903

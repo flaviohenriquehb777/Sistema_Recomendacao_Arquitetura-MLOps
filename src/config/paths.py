@@ -13,7 +13,7 @@ def get_project_root() -> Path:
 
 PROJECT_ROOT = get_project_root()
 DATA_DIR = PROJECT_ROOT / "dados"
-DADOS_BRUTOS = DATA_DIR / "criando_uma_apresentação_executiva.csv"  # Nome padronizado
+DADOS_BRUTOS = DATA_DIR / "sc_base_01_bruto.csv"  # Nome padronizado
 DADOS_TRATADOS = DATA_DIR / "dados_tratados.parquet"  # Exemplo
 
 if not DADOS_BRUTOS.exists():
