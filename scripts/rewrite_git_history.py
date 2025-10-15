@@ -214,25 +214,11 @@ def rewrite_git_history():
     print(f"Encontrados {len(commits)} commits existentes")
     print(f"Cronograma profissional tem {len(timeline)} marcos")
     
-    # Se temos mais marcos que commits, usaremos todos os marcos
-    # Se temos mais commits que marcos, distribuiremos os commits pelos marcos
+    # SEMPRE usar o cronograma completo para criar histórico profissional
+    # Se temos menos commits que marcos, criaremos commits adicionais
+    final_timeline = timeline
     
-    if len(commits) <= len(timeline):
-        # Usar cronograma completo, alguns marcos ficarão sem commits
-        final_timeline = timeline[:len(commits)]
-    else:
-        # Distribuir commits pelos marcos disponíveis
-        final_timeline = timeline
-        # Adicionar commits extras distribuídos
-        extra_commits = len(commits) - len(timeline)
-        for i in range(extra_commits):
-            # Adicionar entre marcos existentes
-            base_date = datetime.strptime(timeline[i % len(timeline)][0], "%Y-%m-%d")
-            new_date = base_date + timedelta(days=random.randint(1, 7))
-            final_timeline.append((new_date.strftime("%Y-%m-%d"), f"refactor: Melhorias incrementais #{i+1}"))
-    
-    # Ordenar por data
-    final_timeline.sort(key=lambda x: x[0])
+    print(f"Usando cronograma completo com {len(final_timeline)} commits profissionais")
     
     print("Iniciando reescrita do histórico...")
     
@@ -245,8 +231,8 @@ def rewrite_git_history():
     # Fazer checkout dos arquivos da branch original
     run_command("git checkout main -- .")
     
-    # Aplicar commits com novas datas
-    for i, ((new_date, new_message), (old_hash, old_message)) in enumerate(zip(final_timeline, commits)):
+    # Aplicar TODOS os commits do cronograma profissional
+    for i, (new_date, new_message) in enumerate(final_timeline):
         print(f"Processando commit {i+1}/{len(final_timeline)}: {new_date} - {new_message}")
         
         # Adicionar todos os arquivos
@@ -256,10 +242,7 @@ def rewrite_git_history():
         commit_date = f"{new_date} 10:00:00"
         env_vars = f'GIT_AUTHOR_DATE="{commit_date}" GIT_COMMITTER_DATE="{commit_date}"'
         
-        # Usar mensagem do cronograma se disponível, senão usar original
-        message = new_message if new_message else old_message
-        
-        stdout, stderr = run_command(f'{env_vars} git commit -m "{message}"', check=False)
+        stdout, stderr = run_command(f'{env_vars} git commit -m "{new_message}"', check=False)
         
         if stderr and "nothing to commit" not in stderr:
             print(f"Aviso no commit: {stderr}")
