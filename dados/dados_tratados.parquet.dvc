@@ -1,0 +1,5 @@
+outs:
+- md5: 01be486ecdb943ec7594640edae9a5f7
+  size: 384633
+  hash: md5
+  path: dados_tratados.parquet

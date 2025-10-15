@@ -1,0 +1,39 @@
+name: Sistema de Recomendação
+description: Sistema de recomendação de produtos com explicabilidade usando SHAP e ambiente MLOps completo
+
+integrations:
+  mlflow:
+    tracking_uri: https://dagshub.com/seu_usuario/Projeto_7_Sistema_de_Recomendacao.mlflow
+    artifact_root: artifacts
+    
+  dvc:
+    remote: myremote
+    auto_push: true
+    
+metrics:
+  - path: metrics.json
+    format: json
+    
+artifacts:
+  - path: models/
+    type: model
+    
+  - path: reports/
+    type: report
+    
+  - path: reports/figuras/
+    type: visualization
+    
+environments:
+  - name: development
+    description: Ambiente de desenvolvimento local
+    
+  - name: production
+    description: Ambiente de produção
+    
+tags:
+  - recomendacao
+  - shap
+  - explicabilidade
+  - mlops
+  - tensorflow
