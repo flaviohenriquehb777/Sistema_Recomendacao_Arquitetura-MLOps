@@ -146,7 +146,7 @@ def rewrite_git_history():
     print("Iniciando reescrita do histórico do Git...")
     
     # Obter lista de commits atuais
-    stdout, _ = run_command("git log --pretty=format:'%H|%s' --reverse")
+    stdout, _ = run_command('git log --pretty=format:"%H|%s" --reverse')
     commits = []
     for line in stdout.split('\n'):
         if '|' in line:
