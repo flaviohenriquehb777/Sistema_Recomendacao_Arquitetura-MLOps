@@ -242,7 +242,7 @@ def rewrite_git_history():
         commit_date = f"{new_date}T10:00:00"
         
         # Usar comando direto sem variáveis de ambiente por enquanto
-        stdout, stderr = run_command(f'git commit -m "{new_message}"', check=False)
+        stdout, stderr = run_command(f'git commit -m "{new_message}" --allow-empty', check=False)
         
         if stderr and "nothing to commit" not in stderr:
             print(f"Aviso no commit: {stderr}")
