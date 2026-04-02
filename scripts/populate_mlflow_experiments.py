@@ -187,7 +187,7 @@ def create_historical_experiments():
             print(f"   📈 Métricas: MSE={exp['metrics']['mse']}, Precision@5={exp['metrics']['precision_at_5']}")
     
     print("\n🎉 Todos os experimentos históricos foram criados com sucesso!")
-    print("🔗 Acesse: https://dagshub.com/flaviohenriquehb777/Projeto_7_Sistema_de_Recomendacao/experiments")
+    print("🔗 Acesse: https://dagshub.com/flaviohenriquehb777/Sistema_Recomendacao_Arquitetura-MLOps/experiments")
 
 def create_model_comparison_experiment():
     """
@@ -236,7 +236,7 @@ if __name__ == "__main__":
         
         print("\n🎯 Processo concluído com sucesso!")
         print("📊 Verifique os experimentos no DagsHub:")
-        print("🔗 https://dagshub.com/flaviohenriquehb777/Projeto_7_Sistema_de_Recomendacao/experiments")
+        print("🔗 https://dagshub.com/flaviohenriquehb777/Sistema_Recomendacao_Arquitetura-MLOps/experiments")
         
     except Exception as e:
         print(f"❌ Erro durante a execução: {e}")

@@ -77,7 +77,7 @@ def setup_dagshub_remote():
     """Configurar remote do DagsHub se necessário"""
     print("\n⚙️ Configurando remote do DagsHub...")
     
-    dagshub_url = "https://dagshub.com/flaviohenriquehb777/Projeto_7_Sistema_de_Recomendacao.dvc"
+    dagshub_url = "https://dagshub.com/flaviohenriquehb777/Sistema_Recomendacao_Arquitetura-MLOps.dvc"
     
     commands = [
         (f"dvc remote add -d dagshub {dagshub_url}", "Adicionar remote DagsHub"),
@@ -272,8 +272,8 @@ def main():
     print("dvc metrics show")
     
     print("\n🔗 Links úteis:")
-    print("DagsHub: https://dagshub.com/flaviohenriquehb777/Projeto_7_Sistema_de_Recomendacao")
-    print("MLflow: https://dagshub.com/flaviohenriquehb777/Projeto_7_Sistema_de_Recomendacao.mlflow")
+    print("DagsHub: https://dagshub.com/flaviohenriquehb777/Sistema_Recomendacao_Arquitetura-MLOps")
+    print("MLflow: https://dagshub.com/flaviohenriquehb777/Sistema_Recomendacao_Arquitetura-MLOps.mlflow")
 
 if __name__ == "__main__":
     main()

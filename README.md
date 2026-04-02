@@ -169,8 +169,8 @@ Para configurar e executar este projeto em seu ambiente local, siga as instruç�
 
 2.  **Clone o repositório:**
 ```bash
-git clone https://github.com/seu_usuario/Projeto_7_Sistema_de_Recomendacao.git
-cd Projeto_7_Sistema_de_Recomendacao
+git clone https://github.com/seu_usuario/Sistema_Recomendacao_Arquitetura-MLOps.git
+cd Sistema_Recomendacao_Arquitetura-MLOps
 ```
 
 3.  **Instale as dependências:**
@@ -190,7 +190,7 @@ dvc pull
 mlflow ui
 
 # Para usar com DagsHub
-export MLFLOW_TRACKING_URI=https://dagshub.com/seu_usuario/Projeto_7_Sistema_de_Recomendacao.mlflow
+export MLFLOW_TRACKING_URI=https://dagshub.com/seu_usuario/Sistema_Recomendacao_Arquitetura-MLOps.mlflow
 export MLFLOW_TRACKING_USERNAME=seu_usuario
 export MLFLOW_TRACKING_PASSWORD=seu_token
 ```
@@ -200,8 +200,8 @@ export MLFLOW_TRACKING_PASSWORD=seu_token
 jupyter lab
 ```
     ```bash
-    git clone [https://github.com/seu-usuario/Projeto_7_Sistema_de_Recomendacao.git](https://github.com/seu-usuario/Projeto_7_Sistema_de_Recomendacao.git)
-    cd Projeto_7_Sistema_de_Recomendacao
+    git clone [https://github.com/seu-usuario/Sistema_Recomendacao_Arquitetura-MLOps.git](https://github.com/seu-usuario/Sistema_Recomendacao_Arquitetura-MLOps.git)
+    cd Sistema_Recomendacao_Arquitetura-MLOps
     ```
     *(Lembre-se de substituir `seu-usuario` pelo seu nome de usuário do GitHub.)*
 
