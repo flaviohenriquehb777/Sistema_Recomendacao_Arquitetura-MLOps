@@ -9,11 +9,11 @@ import dagshub
 from typing import Optional
 
 # Configurações do DagsHub
-DAGSHUB_REPO_OWNER = "flaviohenriquehb777"
-DAGSHUB_REPO_NAME = "Projeto_7_Sistema_de_Recomendacao"
+DAGSHUB_REPO_OWNER = os.getenv("DAGSHUB_REPO_OWNER", "flaviohenriquehb777")
+DAGSHUB_REPO_NAME = os.getenv("DAGSHUB_REPO_NAME", "Sistema_Recomendacao_Arquitetura-MLOps")
 DAGSHUB_URL = f"https://dagshub.com/{DAGSHUB_REPO_OWNER}/{DAGSHUB_REPO_NAME}"
 
-def setup_dagshub_mlflow(experiment_name: str = "sistema_recomendacao") -> None:
+def setup_dagshub_mlflow(experiment_name: str = "sistema_recomendacao") -> bool:
     """
     Configura a integração com DagsHub e MLflow
     

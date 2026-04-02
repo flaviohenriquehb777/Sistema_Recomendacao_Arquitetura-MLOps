@@ -38,7 +38,7 @@ Esta organização segue as **melhores práticas de documentação** em projetos
 
 ### 📁 **Estrutura Recomendada:**
 ```
-Projeto_7_Sistema_de_Recomendacao/
+Sistema_Recomendacao_Arquitetura-MLOps/
 ├── README.md                    ← 🏠 Documentação principal
 ├── docs/                        ← 📚 Documentação especializada
 │   ├── README.md               ← 📋 Índice desta pasta

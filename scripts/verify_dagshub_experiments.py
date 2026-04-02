@@ -55,7 +55,7 @@ def verify_dagshub_experiments():
         # Verificar conectividade com DagsHub
         print("\n🌐 Verificando conectividade com DagsHub...")
         
-        dagshub_url = "https://dagshub.com/flaviohenriquehb777/Projeto_7_Sistema_de_Recomendacao"
+        dagshub_url = "https://dagshub.com/flaviohenriquehb777/Sistema_Recomendacao_Arquitetura-MLOps"
         experiments_url = f"{dagshub_url}/experiments"
         
         try:
@@ -103,7 +103,7 @@ def show_experiment_links():
     print("\n🔗 LINKS DIRETOS PARA VERIFICAÇÃO:")
     print("=" * 50)
     
-    base_url = "https://dagshub.com/flaviohenriquehb777/Projeto_7_Sistema_de_Recomendacao"
+    base_url = "https://dagshub.com/flaviohenriquehb777/Sistema_Recomendacao_Arquitetura-MLOps"
     
     links = [
         ("🏠 Página principal do projeto", base_url),

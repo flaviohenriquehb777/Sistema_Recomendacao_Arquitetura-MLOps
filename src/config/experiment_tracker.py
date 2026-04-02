@@ -23,7 +23,7 @@ class ExperimentTracker:
     """Classe para gerenciar experimentos no DagsHub/MLflow"""
     
     def __init__(self, 
-                 dagshub_repo: str = "flaviohenriquehb777/Projeto_7_Sistema_de_Recomendacao",
+                 dagshub_repo: str = "flaviohenriquehb777/Sistema_Recomendacao_Arquitetura-MLOps",
                  experiment_name: str = "recommendation_system"):
         """
         Inicializar o tracker de experimentos
@@ -40,9 +40,9 @@ class ExperimentTracker:
         """Configurar tracking do DagsHub/MLflow"""
         try:
             # Inicializar DagsHub
-            dagshub.init(repo_owner="flaviohenriquehb777", 
-                        repo_name="Projeto_7_Sistema_de_Recomendacao", 
-                        mlflow=True)
+            repo_owner = os.getenv("DAGSHUB_REPO_OWNER", "flaviohenriquehb777")
+            repo_name = os.getenv("DAGSHUB_REPO_NAME", "Sistema_Recomendacao_Arquitetura-MLOps")
+            dagshub.init(repo_owner=repo_owner, repo_name=repo_name, mlflow=True)
             
             # Configurar MLflow
             mlflow.set_experiment(self.experiment_name)
