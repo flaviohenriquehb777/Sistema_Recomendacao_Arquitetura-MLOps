@@ -211,7 +211,7 @@ if __name__ == "__main__":
         
         print("\n🎯 Experimento ao vivo concluído com sucesso!")
         print("📊 Verifique os resultados no DagsHub:")
-        print("🔗 https://dagshub.com/flaviohenriquehb777/Projeto_7_Sistema_de_Recomendacao/experiments")
+        print("🔗 https://dagshub.com/flaviohenriquehb777/Sistema_Recomendacao_Arquitetura-MLOps/experiments")
         
     except Exception as e:
         print(f"❌ Erro durante o experimento: {e}")

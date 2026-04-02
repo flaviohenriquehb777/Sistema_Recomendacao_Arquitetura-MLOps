@@ -23,7 +23,7 @@ def setup_dagshub_tracking(username=None, repo_name=None):
     """
     # Tenta obter credenciais de variáveis de ambiente se não fornecidas
     username = username or os.getenv("DAGSHUB_USERNAME")
-    repo_name = repo_name or os.getenv("DAGSHUB_REPO_NAME", "Projeto_7_Sistema_de_Recomendacao")
+    repo_name = repo_name or os.getenv("DAGSHUB_REPO_NAME", "Sistema_Recomendacao_Arquitetura-MLOps")
     
     if not username:
         print("AVISO: Nome de usuário do DagsHub não fornecido. Usando configuração local do MLflow.")

@@ -66,7 +66,7 @@ git push origin master
 git init
 
 # Adicionar remote do GitHub
-git remote add origin https://github.com/flaviohenriquehb777/Projeto_7_Sistema_de_Recomendacao.git
+git remote add origin https://github.com/flaviohenriquehb777/Sistema_Recomendacao_Arquitetura-MLOps.git
 
 # Verificar remotes
 git remote -v
@@ -94,7 +94,7 @@ ls -la .dvc/
 #### 2. Configurar Remote DagsHub
 ```bash
 # Adicionar remote DagsHub
-dvc remote add -d dagshub https://dagshub.com/flaviohenriquehb777/Projeto_7_Sistema_de_Recomendacao.dvc
+dvc remote add -d dagshub https://dagshub.com/flaviohenriquehb777/Sistema_Recomendacao_Arquitetura-MLOps.dvc
 
 # Configurar usuário
 dvc remote modify dagshub user flaviohenriquehb777
@@ -162,7 +162,7 @@ tracker.end_run()
 
 ### Visualizar Experimentos
 - **MLflow UI Local**: `mlflow ui`
-- **DagsHub MLflow**: https://dagshub.com/flaviohenriquehb777/Projeto_7_Sistema_de_Recomendacao.mlflow
+- **DagsHub MLflow**: https://dagshub.com/flaviohenriquehb777/Sistema_Recomendacao_Arquitetura-MLOps.mlflow
 
 ## ⚡ Comandos Rápidos
 
@@ -231,7 +231,7 @@ ls -la
 
 # Inicializar repositório se necessário
 git init
-git remote add origin https://github.com/flaviohenriquehb777/Projeto_7_Sistema_de_Recomendacao.git
+git remote add origin https://github.com/flaviohenriquehb777/Sistema_Recomendacao_Arquitetura-MLOps.git
 ```
 
 ### Problema: "DVC is not initialized"
@@ -305,9 +305,9 @@ git push origin main
 
 ## 🔗 Links Úteis
 
-- **Repositório GitHub**: https://github.com/flaviohenriquehb777/Projeto_7_Sistema_de_Recomendacao
-- **Projeto DagsHub**: https://dagshub.com/flaviohenriquehb777/Projeto_7_Sistema_de_Recomendacao
-- **MLflow UI**: https://dagshub.com/flaviohenriquehb777/Projeto_7_Sistema_de_Recomendacao.mlflow
+- **Repositório GitHub**: https://github.com/flaviohenriquehb777/Sistema_Recomendacao_Arquitetura-MLOps
+- **Projeto DagsHub**: https://dagshub.com/flaviohenriquehb777/Sistema_Recomendacao_Arquitetura-MLOps
+- **MLflow UI**: https://dagshub.com/flaviohenriquehb777/Sistema_Recomendacao_Arquitetura-MLOps.mlflow
 - **Documentação DVC**: https://dvc.org/doc
 - **Documentação DagsHub**: https://dagshub.com/docs
 
