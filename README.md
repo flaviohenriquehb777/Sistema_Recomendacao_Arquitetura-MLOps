@@ -8,10 +8,10 @@
 **Sistema de recomendações de produtos para consumidores do Sam's Club - Walmart, utilizando Deep Learning para personalização e otimização da experiência de compra, com ambiente MLOps completo.**
 
 ## Sumário
-- [Descrição do Projeto](#descrição-do-projeto)
+- [Descrição do Modelo](#descrição-do-modelo)
 - [Motivação](#motivação)
 - [Tecnologias Utilizadas](#tecnologias-utilizadas)
-- [Estrutura do Projeto](#estrutura-do-projeto)
+- [Estrutura do Modelo](#estrutura-do-modelo)
 - [Ambiente MLOps](#ambiente-mlops)
 - [Base de Dados](#base-de-dados)
 - [Processo de Desenvolvimento](#processo-de-desenvolvimento)
@@ -21,15 +21,15 @@
 - [Licença](#licença)
 - [Contato](#contato)
 
-## Descrição do Projeto:
+## Descrição do Modelo:
 
-Este projeto implementa um sistema de recomendação de produtos baseado em técnicas de Deep Learning. Utilizando a biblioteca TensorFlow (com a API Keras), o modelo é treinado em uma base de dados de transações do Sam's Club - Walmart para identificar padrões de compra. O objetivo final é gerar uma lista personalizada dos 07 (sete) melhores produtos recomendados para consumidores, otimizando a experiência de compra e as estratégias de vendas.
+Este modelo implementa um sistema de recomendação de produtos baseado em técnicas de Deep Learning. Utilizando a biblioteca TensorFlow (com a API Keras), o modelo é treinado em uma base de dados de transações do Sam's Club - Walmart para identificar padrões de compra. O objetivo final é gerar uma lista personalizada dos 07 (sete) melhores produtos recomendados para consumidores, otimizando a experiência de compra e as estratégias de vendas.
 
 No exemplo demonstrado, as recomendações são geradas para o cliente 'Darrin Van Huff'. No entanto, o sistema foi desenvolvido com uma função flexível que permite a geração de recomendações para *qualquer* consumidor, incluindo novos clientes que não estavam na base de dados original de treinamento.
 
 ## Motivação:
 
-O principal objetivo deste projeto é aprimorar a experiência de compra dos clientes do Sam's Club - Walmart. Ao oferecer recomendações de produtos altamente personalizadas, buscamos aumentar a satisfação do cliente, fomentar a lealdade e, consequentemente, otimizar as vendas e o engajamento com a plataforma, direcionando os usuários para produtos que realmente lhes interessam.
+O principal objetivo deste modelo é aprimorar a experiência de compra dos clientes do Sam's Club - Walmart. Ao oferecer recomendações de produtos altamente personalizadas, buscamos aumentar a satisfação do cliente, fomentar a lealdade e, consequentemente, otimizar as vendas e o engajamento com a plataforma, direcionando os usuários para produtos que realmente lhes interessam.
 
 ## Tecnologias Utilizadas:
 
@@ -44,7 +44,7 @@ O principal objetivo deste projeto é aprimorar a experiência de compra dos cli
 * **GitHub Actions:** Para CI/CD automatizado.
 * **DagsHub:** Para integração e visualização de experimentos MLOps.
 
-## Estrutura do Projeto:
+## Estrutura do Modelo:
 
 Este repositório está organizado da seguinte forma:
 
@@ -63,12 +63,12 @@ Este repositório está organizado da seguinte forma:
     * `populate_mlflow_experiments.py`: Popula MLflow com experimentos históricos.
     * `run_live_experiment.py`: Executa experimentos ao vivo.
     * `verify_dagshub_experiments.py`: Verifica sincronização com DagsHub.
-* `docs/`: Documentação especializada do projeto.
+* `docs/`: Documentação especializada do modelo.
     * `OPTIMIZATION_GUIDE.md`: Guia completo das otimizações implementadas.
     * `SYNC_GUIDE.md`: Guia de sincronização GitHub/DagsHub.
 * `.github/workflows/`: Configurações de CI/CD com GitHub Actions.
 * `.dagshub/`: Configurações para integração com DagsHub.
-* `src/`: Código fonte do projeto.
+* `src/`: Código fonte do modelo.
     * `config/`: Configurações e utilitários.
         * `model_utils.py`: Funções avançadas para o modelo de recomendação.
         * `dagshub_config.py`: Configuração do DagsHub e MLflow.
@@ -76,8 +76,8 @@ Este repositório está organizado da seguinte forma:
 * `img/`: Imagens utilizadas no README.
     * `Screenshot_saida_modelo.png`: Captura de tela da saída de exemplo do modelo.
 * `README.md`: Este arquivo.
-* `LICENSE.md`: Arquivo contendo a licença do projeto (MIT).
-* `requirements.txt`: Lista de todas as dependências Python necessárias para o projeto.
+* `LICENSE.md`: Arquivo contendo a licença do modelo (MIT).
+* `requirements.txt`: Lista de todas as dependências Python necessárias para o modelo.
 
 ## Base de Dados:
 
@@ -115,7 +115,7 @@ O desenvolvimento do sistema de recomendação seguiu as seguintes etapas princi
 
 ## Ambiente MLOps:
 
-Este projeto implementa um ambiente MLOps completo com as seguintes ferramentas e configurações:
+Este modelo implementa um ambiente MLOps completo com as seguintes ferramentas e configurações:
 
 ### DVC (Data Version Control)
 * Versionamento de dados e modelos grandes
@@ -159,7 +159,7 @@ O sistema passou por um processo extensivo de otimização, alcançando **66.1% 
 
 ## Instalação e Uso:
 
-Para configurar e executar este projeto em seu ambiente local, siga as instruções abaixo:
+Para configurar e executar este modelo em seu ambiente local, siga as instruções abaixo:
 
 1.  **Pré-requisitos:**
     * Python 3.8+
@@ -206,7 +206,7 @@ jupyter lab
     *(Lembre-se de substituir `seu-usuario` pelo seu nome de usuário do GitHub.)*
 
 3.  **Crie o arquivo `requirements.txt`:**
-    * Certifique-se de que está na raiz do projeto.
+    * Certifique-se de que está na raiz do modelo.
     * **No PowerShell (Windows):**
         ```powershell
         pip freeze | Out-File -FilePath requirements.txt -Encoding UTF8
@@ -223,8 +223,8 @@ jupyter lab
         pip install -r requirements.txt
         ```
 
-5.  **Execute o Projeto:**
-    * Inicie o Jupyter Lab na raiz do projeto:
+5.  **Execute o Modelo:**
+    * Inicie o Jupyter Lab na raiz do modelo:
         ```bash
         jupyter lab
         ```
@@ -242,7 +242,7 @@ A função `recomendar_produtos`, desenvolvida e presente no notebook final, é 
 
 ## Licença:
 
-Este projeto está licenciado sob a Licença MIT. Para mais detalhes, consulte o arquivo [LICENSE.md](LICENSE.md) na raiz do repositório.
+Este modelo está licenciado sob a Licença MIT. Para mais detalhes, consulte o arquivo [LICENSE.md](LICENSE.md) na raiz do repositório.
 
 ## Contato:
 
