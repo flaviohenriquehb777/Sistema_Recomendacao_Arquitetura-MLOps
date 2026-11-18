@@ -1,7 +1,5 @@
 [core]
     remote = dagshub
-['remote "myremote"']
-    url = gdrive://1Nt_zyNnqnGZZbKhQFGTfvI9rzZ9IPGCJ
 ['remote "dagshub"']
     url = https://dagshub.com/flaviohenriquehb777/Sistema_Recomendacao_Arquitetura-MLOps.dvc
     user = flaviohenriquehb777

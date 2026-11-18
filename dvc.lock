@@ -1,0 +1,131 @@
+schema: '2.0'
+stages:
+  preparacao_dados:
+    cmd: python -m src.scripts.preparar_dados
+    deps:
+    - path: dados/dados_brutos_sams_club.csv
+      hash: md5
+      md5: 1948e384d90182c0a70264f443fd49db
+      size: 2139490
+    - path: src/config/auxiliares_ml.py
+      hash: md5
+      md5: 0b463097a6a1c3243691964460415509
+      size: 862
+    - path: src/config/paths.py
+      hash: md5
+      md5: f2e208ddeaa910921910b6a75537bd59
+      size: 916
+    - path: src/scripts/preparar_dados.py
+      hash: md5
+      md5: 571441bd198f42605d609f4c6f6142bf
+      size: 2249
+    outs:
+    - path: dados/dados_tratados.parquet
+      hash: md5
+      md5: fae039e1ded8887c4d2e5fbd8f96717d
+      size: 387970
+  benchmark_sintetico:
+    cmd: python -m src.scripts.benchmark_sintetico
+    deps:
+    - path: src/config/model_utils.py
+      hash: md5
+      md5: dd3088e8f11b949a8f604f7e1f66dfd5
+      size: 31654
+    - path: src/config/paths.py
+      hash: md5
+      md5: f2e208ddeaa910921910b6a75537bd59
+      size: 916
+    - path: src/config/synthetic_data.py
+      hash: md5
+      md5: 7752aeb7a4ca696791234b5c09dc8bb0
+      size: 10132
+    - path: src/scripts/benchmark_sintetico.py
+      hash: md5
+      md5: fcea35fc39711d8cd8b2ab43a639b6cb
+      size: 11380
+    outs:
+    - path: dados/benchmark_sintetico.parquet
+      hash: md5
+      md5: 6b59a81503e4512e6afd214b4dc6a080
+      size: 722003
+    - path: report/benchmark_sintetico_metricas.json
+      hash: md5
+      md5: 81f0fba5cc2d7a4ef571db5833eb4170
+      size: 2302
+  treinamento_modelo:
+    cmd: python -m src.scripts.otimizacao_modelo
+    deps:
+    - path: dados/dados_tratados.parquet
+      hash: md5
+      md5: fae039e1ded8887c4d2e5fbd8f96717d
+      size: 387970
+    - path: src/config/auxiliares_ml.py
+      hash: md5
+      md5: 0b463097a6a1c3243691964460415509
+      size: 862
+    - path: src/config/mlflow_tracking.py
+      hash: md5
+      md5: 034cb37617efb2a065b9cdb49ebe5b11
+      size: 7358
+    - path: src/config/model_utils.py
+      hash: md5
+      md5: dd3088e8f11b949a8f604f7e1f66dfd5
+      size: 31654
+    - path: src/config/paths.py
+      hash: md5
+      md5: f2e208ddeaa910921910b6a75537bd59
+      size: 916
+    - path: src/scripts/otimizacao_modelo.py
+      hash: md5
+      md5: 1a9792e0431fa135451cbd343653e381
+      size: 10168
+    outs:
+    - path: models/best_model_recomendacao_otimizado.keras
+      hash: md5
+      md5: c06906c5e8172c1c0b0a46a17cb93028
+      size: 1195566
+    - path: models/category_encoder_otimizado.pkl
+      hash: md5
+      md5: 56d7f0d56b5ee15b363c403edf5a737a
+      size: 515
+    - path: models/customer_encoder_otimizado.pkl
+      hash: md5
+      md5: e20ad9cd036744f864277d116fc221c8
+      size: 13127
+    - path: models/hybrid_config_otimizado.pkl
+      hash: md5
+      md5: f137283ef6b66ad6fd837bf8e54957df
+      size: 15146
+    - path: models/product_encoder_otimizado.pkl
+      hash: md5
+      md5: ed3612c3f31b02547346b1e530150a38
+      size: 33974
+    - path: models/subcategory_encoder_otimizado.pkl
+      hash: md5
+      md5: 41f2d98659fed598cb30b0e008af4dfe
+      size: 651
+  treinamento_ensemble:
+    cmd: python -m src.scripts.modelo_ensemble
+    deps:
+    - path: dados/dados_tratados.parquet
+      hash: md5
+      md5: fae039e1ded8887c4d2e5fbd8f96717d
+      size: 387970
+    - path: src/config/auxiliares_ml.py
+      hash: md5
+      md5: 0b463097a6a1c3243691964460415509
+      size: 862
+    - path: src/config/paths.py
+      hash: md5
+      md5: f2e208ddeaa910921910b6a75537bd59
+      size: 916
+    - path: src/scripts/modelo_ensemble.py
+      hash: md5
+      md5: 7d99ceefa9903a92ff7b52c78d2b46dc
+      size: 25748
+    outs:
+    - path: models/ensemble/
+      hash: md5
+      md5: e52955981f715da48b2229c431442061.dir
+      size: 76640766
+      nfiles: 12

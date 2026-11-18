@@ -1,5 +1,5 @@
 from pathlib import Path
-import sys
+
 
 def get_project_root() -> Path:
     """Retorna a raiz do projeto baseado em marcadores."""

@@ -1,0 +1,75 @@
+{
+  "base": "sintetica (reprodutivel, seed=42)",
+  "resumo_base": {
+    "interacoes": 66020,
+    "clientes": 3000,
+    "produtos": 990,
+    "categorias": 8,
+    "subcategorias": 40,
+    "itens_por_cliente_media": 22.006666666666668,
+    "itens_por_cliente_mediana": 22.0,
+    "densidade": 0.02222895622895623
+  },
+  "alpha_hibrido": 1.0,
+  "modelo_final": "NeuMF puro",
+  "val_ndcg_final": 0.1076884454712166,
+  "val_ndcg_neumf": 0.1076884454712166,
+  "metricas_teste": {
+    "final": {
+      "ndcg@7": 0.11413140198400629,
+      "map@7": 0.08822857142857143,
+      "hit_rate@7": 0.19666666666666666,
+      "precision@7": 0.028095238095238093,
+      "recall@7": 0.19666666666666666,
+      "f1@7": 0.049166666666666664,
+      "num_customers": 3000.0,
+      "num_products": 990.0
+    },
+    "hibrido": {
+      "ndcg@7": 0.10848283171870794,
+      "map@7": 0.0835468253968254,
+      "hit_rate@7": 0.18766666666666668,
+      "precision@7": 0.026809523809523804,
+      "recall@7": 0.18766666666666668,
+      "f1@7": 0.04691666666666667,
+      "num_customers": 3000.0,
+      "num_products": 990.0
+    },
+    "neumf_puro": {
+      "ndcg@7": 0.11413140198400629,
+      "map@7": 0.08822857142857143,
+      "hit_rate@7": 0.19666666666666666,
+      "precision@7": 0.028095238095238093,
+      "recall@7": 0.19666666666666666,
+      "f1@7": 0.049166666666666664,
+      "num_customers": 3000.0,
+      "num_products": 990.0
+    },
+    "mais_populares": {
+      "ndcg@7": 0.021464869743558723,
+      "map@7": 0.016013492063492063,
+      "hit_rate@7": 0.039,
+      "precision@7": 0.005571428571428571,
+      "recall@7": 0.039,
+      "f1@7": 0.00975,
+      "num_customers": 3000.0,
+      "num_products": 990.0
+    },
+    "oracle_afinidade": {
+      "ndcg@7": 0.1400315968322293,
+      "map@7": 0.10601269841269842,
+      "hit_rate@7": 0.24833333333333332,
+      "precision@7": 0.035476190476190474,
+      "recall@7": 0.24833333333333332,
+      "f1@7": 0.06208333333333333,
+      "num_customers": 3000.0,
+      "num_products": 990.0
+    },
+    "aleatorio": {
+      "hit_rate@7": 0.0072167128149405275,
+      "precision@7": 0.0010309589735629325,
+      "recall@7": 0.007216712814940528
+    }
+  },
+  "ganho_ndcg_sobre_populares": 4.317125300434463
+}
