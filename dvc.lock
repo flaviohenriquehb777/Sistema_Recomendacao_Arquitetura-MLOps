@@ -1,0 +1,183 @@
+schema: '2.0'
+stages:
+  preparacao_dados:
+    cmd: python -m src.scripts.preparar_dados
+    deps:
+    - path: dados/sc_base_01/sc_base_01_bruto.csv
+      hash: md5
+      md5: 1948e384d90182c0a70264f443fd49db
+      size: 2139490
+    - path: src/config/auxiliares_ml.py
+      hash: md5
+      md5: 0b463097a6a1c3243691964460415509
+      size: 862
+    - path: src/config/paths.py
+      hash: md5
+      md5: f2e208ddeaa910921910b6a75537bd59
+      size: 916
+    - path: src/scripts/preparar_dados.py
+      hash: md5
+      md5: 571441bd198f42605d609f4c6f6142bf
+      size: 2249
+    outs:
+    - path: dados/dados_tratados.parquet
+      hash: md5
+      md5: fae039e1ded8887c4d2e5fbd8f96717d
+      size: 387970
+  benchmark_sintetico:
+    cmd: python -m src.scripts.benchmark_sintetico
+    deps:
+    - path: src/config/mlflow_tracking.py
+      hash: md5
+      md5: 92229466cb8179cb2f02819b5e971a38
+      size: 9307
+    - path: src/config/model_utils.py
+      hash: md5
+      md5: dd3088e8f11b949a8f604f7e1f66dfd5
+      size: 31654
+    - path: src/config/paths.py
+      hash: md5
+      md5: f2e208ddeaa910921910b6a75537bd59
+      size: 916
+    - path: src/config/synthetic_data.py
+      hash: md5
+      md5: 7752aeb7a4ca696791234b5c09dc8bb0
+      size: 10132
+    - path: src/scripts/benchmark_sintetico.py
+      hash: md5
+      md5: a4022686ac0d9e99dfd9ed1acab31c56
+      size: 12928
+    outs:
+    - path: dados/benchmark_sintetico.parquet
+      hash: md5
+      md5: 6b59a81503e4512e6afd214b4dc6a080
+      size: 722003
+    - path: report/benchmark_sintetico_metricas.json
+      hash: md5
+      md5: 81f0fba5cc2d7a4ef571db5833eb4170
+      size: 2302
+  treinamento_modelo:
+    cmd: python -m src.scripts.otimizacao_modelo
+    deps:
+    - path: dados/dados_tratados.parquet
+      hash: md5
+      md5: fae039e1ded8887c4d2e5fbd8f96717d
+      size: 387970
+    - path: src/config/auxiliares_ml.py
+      hash: md5
+      md5: 0b463097a6a1c3243691964460415509
+      size: 862
+    - path: src/config/mlflow_tracking.py
+      hash: md5
+      md5: 92229466cb8179cb2f02819b5e971a38
+      size: 9307
+    - path: src/config/model_utils.py
+      hash: md5
+      md5: dd3088e8f11b949a8f604f7e1f66dfd5
+      size: 31654
+    - path: src/config/paths.py
+      hash: md5
+      md5: f2e208ddeaa910921910b6a75537bd59
+      size: 916
+    - path: src/scripts/otimizacao_modelo.py
+      hash: md5
+      md5: 06f1e859f6d382807a57781dd42838d7
+      size: 10469
+    outs:
+    - path: models/best_model_recomendacao_otimizado.keras
+      hash: md5
+      md5: 9596c7aa9cb5a3704b242454b52672e7
+      size: 1195566
+    - path: models/category_encoder_otimizado.pkl
+      hash: md5
+      md5: 56d7f0d56b5ee15b363c403edf5a737a
+      size: 515
+    - path: models/customer_encoder_otimizado.pkl
+      hash: md5
+      md5: e20ad9cd036744f864277d116fc221c8
+      size: 13127
+    - path: models/hybrid_config_otimizado.pkl
+      hash: md5
+      md5: f137283ef6b66ad6fd837bf8e54957df
+      size: 15146
+    - path: models/product_encoder_otimizado.pkl
+      hash: md5
+      md5: ed3612c3f31b02547346b1e530150a38
+      size: 33974
+    - path: models/subcategory_encoder_otimizado.pkl
+      hash: md5
+      md5: 41f2d98659fed598cb30b0e008af4dfe
+      size: 651
+  treinamento_ensemble:
+    cmd: python -m src.scripts.modelo_ensemble
+    deps:
+    - path: dados/dados_tratados.parquet
+      hash: md5
+      md5: fae039e1ded8887c4d2e5fbd8f96717d
+      size: 387970
+    - path: src/config/auxiliares_ml.py
+      hash: md5
+      md5: 0b463097a6a1c3243691964460415509
+      size: 862
+    - path: src/config/paths.py
+      hash: md5
+      md5: f2e208ddeaa910921910b6a75537bd59
+      size: 916
+    - path: src/scripts/modelo_ensemble.py
+      hash: md5
+      md5: 7d99ceefa9903a92ff7b52c78d2b46dc
+      size: 25748
+    outs:
+    - path: models/ensemble/
+      hash: md5
+      md5: e52955981f715da48b2229c431442061.dir
+      size: 76640766
+      nfiles: 12
+  benchmark_publico_sc_base_03:
+    cmd: python -m src.scripts.benchmark_sc_base_03
+    deps:
+    - path: dados/sc_base_03/category_tree.csv
+      hash: md5
+      md5: f0e1eb878ae66209004112f6355d7e83
+      size: 14454
+    - path: dados/sc_base_03/events.csv
+      hash: md5
+      md5: fddaf7c1c6a9df23a726500a08ffdd7e
+      size: 94237913
+    - path: dados/sc_base_03/item_properties_part1.csv
+      hash: md5
+      md5: cb43a0682a1af76f1c1b60f9163ae47b
+      size: 484315749
+    - path: dados/sc_base_03/item_properties_part2.csv
+      hash: md5
+      md5: e74ec953e7b192920b195dfd82dc2a4e
+      size: 408929907
+    - path: src/config/mlflow_tracking.py
+      hash: md5
+      md5: 92229466cb8179cb2f02819b5e971a38
+      size: 9307
+    - path: src/config/model_utils.py
+      hash: md5
+      md5: dd3088e8f11b949a8f604f7e1f66dfd5
+      size: 31654
+    - path: src/config/paths.py
+      hash: md5
+      md5: f2e208ddeaa910921910b6a75537bd59
+      size: 916
+    - path: src/config/sc_base_03_data.py
+      hash: md5
+      md5: 3bb24aea36285a54a87bc5c1ee22e2e6
+      size: 8115
+    - path: src/scripts/benchmark_sc_base_03.py
+      hash: md5
+      md5: 51cbb7a37239e52d5088f35c6e7107b7
+      size: 11555
+    outs:
+    - path: dados/benchmark_sc_base_03.parquet
+      hash: md5
+      md5: e6b6e4301a39bbb9a0d6f43fda0c22c7
+      size: 1491364
+    - path: report/benchmark_sc_base_03_metricas.json
+      hash: md5
+      md5: 2084cb94ebaacfb9089daafbf04073a6
+      size: 1998

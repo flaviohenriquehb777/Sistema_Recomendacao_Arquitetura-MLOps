@@ -3,125 +3,150 @@
 Testes unitários para model_utils.py
 """
 
+import os
+import sys
 import unittest
+
 import numpy as np
 import pandas as pd
 import tensorflow as tf
 from sklearn.preprocessing import LabelEncoder, MinMaxScaler
-import sys
-import os
 
 # Adicionar src ao path
 sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'src'))
 
 from config.model_utils import (
-    create_model_with_regularization,
-    calculate_recommendation_metrics
+    combine_scores,
+    compute_popularity_prior,
+    create_ranking_model,
+    evaluate_most_popular,
+    to_model_inputs,
+    train_ranking_model,
 )
 
+
 class TestModelUtils(unittest.TestCase):
-    
+    """Testes do NeuMF (ranking) e do recomendador híbrido popularity-first."""
+
     def setUp(self):
         """Configuração inicial para os testes"""
-        # Dados de exemplo
         np.random.seed(42)
-        tf.random.set_seed(42)
-        
-        # Criar dados sintéticos
+        tf.keras.utils.set_random_seed(42)
+
+        # Dimensões sintéticas do problema
         self.num_customers = 100
         self.num_products = 50
         self.num_categories = 5
         self.num_subcategories = 10
-        
-        # Parâmetros do modelo
-        self.embedding_dim = 32
-        self.l2_strength = 0.01
-        self.dropout_rate = 0.3
-        
-    def test_create_model_with_regularization(self):
-        """Testa a criação do modelo com regularização"""
-        model = create_model_with_regularization(
+
+    def test_create_ranking_model(self):
+        """O NeuMF é criado e produz probabilidades válidas a partir das 4 entradas."""
+        model = create_ranking_model(
             num_customers=self.num_customers,
             num_products=self.num_products,
             num_categories=self.num_categories,
             num_subcategories=self.num_subcategories,
-            embedding_dim=self.embedding_dim,
-            l2_strength=self.l2_strength,
-            dropout_rate=self.dropout_rate
+            embedding_dim=16,
         )
-        
-        # Verificar se o modelo foi criado
-        self.assertIsNotNone(model)
+
         self.assertIsInstance(model, tf.keras.Model)
-        
-        # Verificar se o modelo tem as camadas esperadas
         self.assertTrue(len(model.layers) > 0)
-        
-        # Verificar se o modelo pode fazer predições
+
         dummy_input = [
             np.random.randint(0, self.num_customers, (10, 1)),
             np.random.randint(0, self.num_products, (10, 1)),
             np.random.randint(0, self.num_categories, (10, 1)),
-            np.random.randint(0, self.num_subcategories, (10, 1))
+            np.random.randint(0, self.num_subcategories, (10, 1)),
         ]
-        
         predictions = model.predict(dummy_input, verbose=0)
+
         self.assertEqual(predictions.shape, (10, 1))
-        
-    def test_calculate_recommendation_metrics(self):
-        """Testa o cálculo de métricas de recomendação"""
-        # Dados de exemplo
-        y_true = np.array([1, 0, 1, 1, 0])
-        y_pred = np.array([0.9, 0.1, 0.8, 0.7, 0.2])
-        
-        # Calcular métricas
-        precision_5, recall_5, f1_5 = calculate_recommendation_metrics(y_true, y_pred, k=5)
-        
-        # Verificar se as métricas estão no intervalo correto
-        self.assertGreaterEqual(precision_5, 0.0)
-        self.assertLessEqual(precision_5, 1.0)
-        self.assertGreaterEqual(recall_5, 0.0)
-        self.assertLessEqual(recall_5, 1.0)
-        self.assertGreaterEqual(f1_5, 0.0)
-        self.assertLessEqual(f1_5, 1.0)
-        
-    def test_model_training_basic(self):
-        """Testa treinamento básico do modelo"""
-        model = create_model_with_regularization(
+        self.assertTrue(np.all(predictions >= 0.0) and np.all(predictions <= 1.0))
+
+    def test_compute_popularity_prior(self):
+        """O prior de popularidade conta as interações por produto no treino."""
+        train_pairs = pd.DataFrame({"c": [0, 0, 1, 1, 1], "p": [0, 1, 1, 1, 2]})
+
+        prior = compute_popularity_prior(train_pairs, num_products=4)
+
+        np.testing.assert_array_equal(prior, np.array([1.0, 3.0, 1.0, 0.0]))
+
+    def test_combine_scores_alpha_zero_is_popularity(self):
+        """Com alpha=0 o score é apenas o prior de popularidade (sem personalização)."""
+        popularity = np.array([0.0, 1.0, 2.0, 3.0, 10.0])
+        model_scores = np.random.random((3, 5))
+
+        scores = combine_scores(model_scores, popularity, alpha=0.0)
+
+        self.assertEqual(scores.shape, (3, 5))
+        np.testing.assert_allclose(scores[0], scores[1])
+        np.testing.assert_allclose(scores[1], scores[2])
+
+        # Com alpha>0 o sinal do NeuMF passa a diferenciar as linhas.
+        scores_personalizado = combine_scores(model_scores, popularity, alpha=1.0)
+        self.assertFalse(np.allclose(scores_personalizado[0], scores_personalizado[1]))
+
+    def test_to_model_inputs(self):
+        """to_model_inputs devolve os 4 arrays do NeuMF com o contexto do catálogo."""
+        catalog = (
+            np.array([0, 1, 2], dtype="int32"),
+            np.array([0, 1, 0], dtype="int32"),  # categoria por produto
+            np.array([0, 1, 1], dtype="int32"),  # subcategoria por produto
+        )
+        customers = np.array([7, 9])
+        products = np.array([0, 2])
+
+        inputs = to_model_inputs(customers, products, catalog)
+
+        self.assertEqual(len(inputs), 4)
+        for arr in inputs:
+            self.assertEqual(arr.shape, (2, 1))
+        np.testing.assert_array_equal(inputs[0].ravel(), customers)
+        np.testing.assert_array_equal(inputs[1].ravel(), products)
+        np.testing.assert_array_equal(inputs[2].ravel(), np.array([0, 0]))
+        np.testing.assert_array_equal(inputs[3].ravel(), np.array([0, 1]))
+
+    def test_train_ranking_model_basic(self):
+        """O loop de treino de ranking roda e registra o histórico por época."""
+        model = create_ranking_model(
             num_customers=self.num_customers,
             num_products=self.num_products,
             num_categories=self.num_categories,
             num_subcategories=self.num_subcategories,
-            embedding_dim=16,  # Menor para teste rápido
-            l2_strength=0.01,
-            dropout_rate=0.2
+            embedding_dim=8,
         )
-        
-        # Dados sintéticos para treinamento
+
         n_samples = 200
-        X_train = [
-            np.random.randint(0, self.num_customers, (n_samples, 1)),
-            np.random.randint(0, self.num_products, (n_samples, 1)),
-            np.random.randint(0, self.num_categories, (n_samples, 1)),
-            np.random.randint(0, self.num_subcategories, (n_samples, 1))
-        ]
-        y_train = np.random.random((n_samples, 1))
-        
-        # Treinar por poucas épocas
-        history = model.fit(
-            X_train, y_train,
+        history = train_ranking_model(
+            model,
+            train_customers=np.random.randint(0, self.num_customers, n_samples),
+            train_products=np.random.randint(0, self.num_products, n_samples),
+            categories=np.random.randint(0, self.num_categories, n_samples),
+            subcategories=np.random.randint(0, self.num_subcategories, n_samples),
+            labels=np.random.randint(0, 2, n_samples).astype("float32"),
             epochs=2,
             batch_size=32,
             verbose=0,
-            validation_split=0.2
         )
-        
-        # Verificar se o histórico foi criado
-        self.assertIn('loss', history.history)
-        self.assertIn('val_loss', history.history)
-        
-        # Verificar se houve pelo menos 2 épocas
-        self.assertEqual(len(history.history['loss']), 2)
+
+        self.assertIn("loss", history.history)
+        self.assertEqual(len(history.history["loss"]), 2)
+
+    def test_evaluate_most_popular_baseline(self):
+        """O baseline popular roda no leave-last-out e devolve métricas no intervalo [0, 1]."""
+        train_pairs = pd.DataFrame({"c": [0, 0, 0, 1, 1, 1], "p": [0, 1, 2, 0, 1, 2]})
+        test_pairs = pd.DataFrame({"c": [0, 1], "p": [3, 3]})
+
+        metricas = evaluate_most_popular(test_pairs, train_pairs, num_products=5, k=2)
+
+        for chave in ["ndcg@2", "map@2", "hit_rate@2", "precision@2", "recall@2", "f1@2"]:
+            self.assertIn(chave, metricas)
+        for chave, valor in metricas.items():
+            if "@" not in chave:
+                continue
+            self.assertGreaterEqual(valor, 0.0)
+            self.assertLessEqual(valor, 1.0)
+
 
 class TestDataProcessing(unittest.TestCase):
     

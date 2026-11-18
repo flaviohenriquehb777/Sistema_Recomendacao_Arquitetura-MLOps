@@ -1,0 +1,99 @@
+# =============================================================================
+# Sistema de Recomendação (Sam's Club) — Metadados e dependências do projeto
+# -----------------------------------------------------------------------------
+# Este arquivo é a FONTE ÚNICA do ambiente (gerenciado por uv).
+#   - uv.lock      : fixa todas as versões resolvidas (reprodutibilidade total).
+#   - requirements.txt : exportado do lock (uv export) para compatibilidade
+#                        com ferramentas que ainda usam pip.
+#
+# Requer Python 3.11. O stack de Deep Learning é TensorFlow 2.19 (Keras 3 nativo),
+# que é a versão com que os modelos salvos em `models/` foram gerados (Keras 3.9.0).
+# Comandos do dia a dia:
+#   uv sync           # cria/atualiza o .venv a partir do lock
+#   uv lock           # atualiza o lock a partir deste pyproject.toml
+#   uv export --no-hashes --format requirements-txt > requirements.txt
+# =============================================================================
+
+[project]
+name = "sistema-recomendacao-mlops"
+version = "1.1.0"
+description = "Sistema de recomendação de produtos com explicabilidade (SHAP) e ambiente MLOps completo (DVC + MLflow/DagsHub)."
+readme = "README.md"
+requires-python = ">=3.11,<3.12"
+license = { file = "LICENSE.md" }
+authors = [
+    { name = "Flávio Henrique Barbosa", email = "flaviohenriquehb777@outlook.com" },
+]
+keywords = [
+    "recomendacao",
+    "mlops",
+    "shap",
+    "explicabilidade",
+    "tensorflow",
+    "dvc",
+    "mlflow",
+]
+classifiers = [
+    "Programming Language :: Python :: 3.11",
+    "License :: OSI Approved :: MIT License",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+
+# Dependências: as críticas ficam fixadas (==) para casar com os artefatos salvos
+# em `models/`; o restante usa faixa mínima e é congelado no uv.lock.
+dependencies = [
+    # --- Núcleo de dados e modelagem ---
+    "numpy==1.26.4",
+    "pandas==2.2.3",
+    "scipy==1.14.1",
+    # scikit-learn 1.6.1 é a versão com que os encoders `.pkl` foram gerados
+    # (evita InconsistentVersionWarning ao carregá-los).
+    "scikit-learn==1.6.1",
+    "joblib>=1.4",
+    # pyarrow >= 20 exige NumPy 2.x em tempo de execução, mas o stack é fixado em
+    # NumPy 1.26.4 (compatível com TF 2.19/Keras 3.9 e com os encoders salvos).
+    # Por isso limitamos a faixa para manter a leitura de Parquet funcional.
+    "pyarrow>=17,<20",
+    # --- Deep Learning (Keras 3 nativo no TensorFlow 2.19) ---
+    # keras 3.9.0 é a versão com que os modelos `.keras` foram salvos.
+    "tensorflow==2.19.0",
+    "keras==3.9.0",
+    # --- Visualização e explicabilidade ---
+    "matplotlib>=3.8",
+    "seaborn>=0.13",
+    "shap>=0.46",
+    "reportlab>=4.0",
+    # --- MLOps: versionamento de dados (DVC) e rastreamento (MLflow/DagsHub) ---
+    # dvc < 3.66 importa o privado `pathspec._DIR_MARK`, removido no pathspec >= 1.0.
+    "dvc>=3.66",
+    "dvc-http>=2.32",
+    "mlflow>=3.0",
+    "dagshub>=0.5",
+    # --- Qualidade de código e testes ---
+    "pytest>=8",
+    "pytest-cov>=5",
+    "black>=24",
+    "isort>=5.13",
+    "ruff>=0.6",
+    "pre-commit>=3.7",
+    # --- Notebooks ---
+    "jupyter>=1.0",
+    "ipykernel>=6.29",
+    "nbconvert>=7.16",
+    # --- Utilitários ---
+    "tqdm>=4.66",
+    "python-dotenv>=1.0",
+    # Venvs do uv não trazem setuptools; algumas libs ainda importam pkg_resources.
+    "setuptools>=69",
+]
+
+[tool.uv]
+# Projeto de aplicação (não é distribuído como pacote); o código vive em src/.
+package = false
+# Garante que o lock seja INSTALÁVEL no Windows (win_amd64). Sem isto, o uv
+# resolve `tensorflow-io-gcs-filesystem` para versões (>=0.35) que só têm wheel
+# para macOS/Linux, quebrando `uv sync` nesta plataforma. Forçando o ambiente,
+# o uv escolhe uma versão com wheel também para Windows (ex.: 0.31.0).
+required-environments = [
+    "sys_platform == 'win32' and platform_machine == 'AMD64'",
+]
