@@ -173,7 +173,7 @@ def resumo_base(df: pd.DataFrame) -> dict:
     """Estatísticas descritivas da base (para o relatório de benchmark)."""
     clientes = int(df["Customer Name"].nunique())
     produtos = int(df["Product ID"].nunique())
-    interacoes = int(len(df))
+    interacoes = len(df)
     por_cliente = df.groupby("Customer Name")["Product ID"].nunique()
     densidade = interacoes / (clientes * produtos) if clientes and produtos else float("nan")
     return {
