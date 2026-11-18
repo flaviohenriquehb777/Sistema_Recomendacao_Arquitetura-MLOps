@@ -5,18 +5,20 @@ Script para executar um experimento ao vivo com tracking MLflow
 
 import os
 import sys
-import mlflow
-import pandas as pd
-import numpy as np
 from datetime import datetime
+
+import mlflow
+import numpy as np
+import pandas as pd
 import tensorflow as tf
+from sklearn.metrics import mean_absolute_error, mean_squared_error
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import LabelEncoder, StandardScaler
-from sklearn.metrics import mean_squared_error, mean_absolute_error
 
 # Adicionar src ao path
 sys.path.append('src')
 from config.dagshub_config import setup_dagshub_mlflow
+
 
 def create_sample_data():
     """
@@ -198,7 +200,7 @@ def run_live_experiment():
             if os.path.exists(temp_file):
                 os.remove(temp_file)
         
-        print(f"✅ Experimento concluído!")
+        print("✅ Experimento concluído!")
         print(f"📊 MSE Test: {test_mse:.4f}")
         print(f"📊 MAE Test: {test_mae:.4f}")
         print(f"🔗 Run ID: {run.info.run_id}")

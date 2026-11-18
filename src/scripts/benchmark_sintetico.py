@@ -32,6 +32,7 @@ import numpy as np
 import tensorflow as tf
 from sklearn.preprocessing import LabelEncoder
 
+from src.config.mlflow_tracking import log_run, setup_mlflow
 from src.config.model_utils import (
     RANDOM_SEED,
     TOP_K,
@@ -51,7 +52,6 @@ from src.config.model_utils import (
     train_validation_test_split,
 )
 from src.config.paths import DATA_DIR, REPORTS_DIR
-from src.config.mlflow_tracking import log_run, setup_mlflow
 from src.config.synthetic_data import dataset_summary, generate_synthetic_dataset
 
 # Escala do benchmark (base sintética — ver docstring do gerador).

@@ -16,8 +16,8 @@ Uso:
 
 import pandas as pd
 
-from src.config.paths import DADOS_BRUTOS, DADOS_TRATADOS
 from src.config.auxiliares_ml import downcast_dataframe
+from src.config.paths import DADOS_BRUTOS, DADOS_TRATADOS
 
 # Valor aplicado pelo notebook original aos 'Postal Code' nulos.
 POSTAL_CODE_PADRAO = 5401

@@ -2,8 +2,10 @@
 Configuração do MLflow para rastreamento de experimentos do modelo de recomendação.
 """
 import os
+
 import mlflow
 from mlflow.tracking import MlflowClient
+
 
 def setup_mlflow(experiment_name="recomendacao_produtos", tracking_uri=None):
     """

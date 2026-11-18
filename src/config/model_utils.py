@@ -41,7 +41,7 @@ reprodutibilidade.
 from __future__ import annotations
 
 import math
-from typing import Dict, Iterable, List, Sequence, Tuple
+from collections.abc import Iterable, Sequence
 
 import numpy as np
 import pandas as pd
@@ -65,7 +65,7 @@ def build_item_catalog(
     product_col: str = "Product ID",
     category_col: str = "Category",
     subcategory_col: str = "Sub-Category",
-) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
+) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
     """
     Constrói o catálogo de itens alinhado ao índice do ``LabelEncoder`` de produtos.
 
@@ -104,7 +104,7 @@ def train_validation_test_split(
     customer_col: str = "Customer Name",
     product_col: str = "Product ID",
     date_col: str = "Order Date",
-) -> Tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
+) -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
     """
     Divide as interações (cliente, produto) em treino, validação e teste.
 
@@ -153,12 +153,12 @@ def train_validation_test_split(
 # ---------------------------------------------------------------------------
 # Amostragem de negativos
 # ---------------------------------------------------------------------------
-def _seen_products_by_customer(pairs: pd.DataFrame) -> Dict[int, set]:
+def _seen_products_by_customer(pairs: pd.DataFrame) -> dict[int, set]:
     return pairs.groupby("c")["p"].apply(set).to_dict()
 
 
 def _sample_negative_products(
-    customers: np.ndarray, seen: Dict[int, set], num_products: int, rng: np.random.Generator
+    customers: np.ndarray, seen: dict[int, set], num_products: int, rng: np.random.Generator
 ) -> np.ndarray:
     """Sorteia um produto não visto para cada cliente (com re-sorteio em colisões)."""
     negatives = rng.integers(0, num_products, size=len(customers))
@@ -180,7 +180,7 @@ def build_training_pairs(
     n_negatives: int = 8,
     seed: int = RANDOM_SEED,
     exclude_pairs: pd.DataFrame | None = None,
-) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
+) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
     """
     Monta o conjunto de treino (positivos + negativos) para a perda de ranking.
 
@@ -355,8 +355,8 @@ def train_ranking_model(
 def to_model_inputs(
     customers: np.ndarray,
     products: np.ndarray,
-    catalog: Tuple[np.ndarray, np.ndarray, np.ndarray],
-) -> List[np.ndarray]:
+    catalog: tuple[np.ndarray, np.ndarray, np.ndarray],
+) -> list[np.ndarray]:
     """Converte (clientes, produtos) nos 4 arrays de entrada do modelo NeuMF."""
     customers = np.asarray(customers)
     products = np.asarray(products)
@@ -368,7 +368,7 @@ def to_model_inputs(
     ]
 
 
-def categories_for_products(products: np.ndarray, catalog: Tuple[np.ndarray, np.ndarray, np.ndarray]) -> Tuple[np.ndarray, np.ndarray]:
+def categories_for_products(products: np.ndarray, catalog: tuple[np.ndarray, np.ndarray, np.ndarray]) -> tuple[np.ndarray, np.ndarray]:
     """Mapeia um vetor de IDs de produto para as categorias/subcategorias do catálogo."""
     _, category_ids, subcategory_ids = catalog
     return category_ids[products], subcategory_ids[products]
@@ -380,7 +380,7 @@ def categories_for_products(products: np.ndarray, catalog: Tuple[np.ndarray, np.
 def score_catalog(
     model: tf.keras.Model,
     customers: Sequence[int],
-    catalog: Tuple[np.ndarray, np.ndarray, np.ndarray],
+    catalog: tuple[np.ndarray, np.ndarray, np.ndarray],
     batch_size: int = 8192,
     seed: int = RANDOM_SEED,
 ) -> np.ndarray:
@@ -412,7 +412,7 @@ def score_catalog(
     return scores.reshape(len(customers), num_products)
 
 
-def _rank_top_k(scores: np.ndarray, excluded: Iterable[int], k: int) -> List[int]:
+def _rank_top_k(scores: np.ndarray, excluded: Iterable[int], k: int) -> list[int]:
     """Retorna os índices dos top-k itens, ignorando os itens excluídos (já vistos)."""
     scores = scores.copy()
     excluded = list(excluded)
@@ -457,11 +457,11 @@ def combine_scores(
 
 def _ranking_metrics_from_scores(
     scores: np.ndarray,
-    seen_by_customer: Dict[int, set],
-    relevant_by_customer: Dict[int, set],
+    seen_by_customer: dict[int, set],
+    relevant_by_customer: dict[int, set],
     customers: Sequence[int],
     k: int,
-) -> Dict[str, float]:
+) -> dict[str, float]:
     """Calcula NDCG@k, MAP@k, Hit-Rate@k, Precision@k, Recall@k e F1@k a partir dos scores."""
     ndcg, average_precision, hit_rate = [], [], []
     precision, recall = [], []
@@ -514,11 +514,11 @@ def evaluate_ranking(
     model: tf.keras.Model,
     test_pairs: pd.DataFrame,
     train_pairs: pd.DataFrame,
-    catalog: Tuple[np.ndarray, np.ndarray, np.ndarray],
+    catalog: tuple[np.ndarray, np.ndarray, np.ndarray],
     k: int = TOP_K,
     max_customers: int | None = None,
     seed: int = RANDOM_SEED,
-) -> Dict[str, float]:
+) -> dict[str, float]:
     """
     Avalia o NeuMF puro no protocolo leave-last-out.
 
@@ -545,11 +545,11 @@ def evaluate_hybrid(
     model: tf.keras.Model,
     eval_pairs: pd.DataFrame,
     train_pairs: pd.DataFrame,
-    catalog: Tuple[np.ndarray, np.ndarray, np.ndarray],
+    catalog: tuple[np.ndarray, np.ndarray, np.ndarray],
     popularity: np.ndarray,
     alpha: float,
     k: int = TOP_K,
-) -> Dict[str, float]:
+) -> dict[str, float]:
     """
     Avalia o recomendador **híbrido popularity-first** no protocolo leave-last-out.
 
@@ -571,7 +571,7 @@ def evaluate_from_scores(
     train_pairs: pd.DataFrame,
     eval_pairs: pd.DataFrame,
     k: int = TOP_K,
-) -> Dict[str, float]:
+) -> dict[str, float]:
     """
     Calcula as métricas de ranking a partir de uma matriz de scores já pronta.
 
@@ -600,12 +600,12 @@ def select_alpha(
     model: tf.keras.Model,
     val_pairs: pd.DataFrame,
     train_pairs: pd.DataFrame,
-    catalog: Tuple[np.ndarray, np.ndarray, np.ndarray],
+    catalog: tuple[np.ndarray, np.ndarray, np.ndarray],
     popularity: np.ndarray,
     alphas: Sequence[float] = (0.0, 0.1, 0.25, 0.5, 1.0),
     k: int = TOP_K,
     min_gain: float = 1e-4,
-) -> Tuple[float, Dict[float, float]]:
+) -> tuple[float, dict[float, float]]:
     """
     Escolhe o peso ``alpha`` do sinal personalizado na **validação**.
 
@@ -620,7 +620,7 @@ def select_alpha(
     model_z = _zscore(score_catalog(model, customers, catalog), axis=1)
     pop_z = _zscore(np.log1p(np.asarray(popularity, dtype="float64")))
 
-    historico: Dict[float, float] = {}
+    historico: dict[float, float] = {}
     for alpha in alphas:
         scores = pop_z[None, :] + float(alpha) * model_z
         historico[float(alpha)] = _ranking_metrics_from_scores(
@@ -647,7 +647,7 @@ class RankingCheckpoint(tf.keras.callbacks.Callback):
         self,
         val_pairs: pd.DataFrame,
         train_pairs: pd.DataFrame,
-        catalog: Tuple[np.ndarray, np.ndarray, np.ndarray],
+        catalog: tuple[np.ndarray, np.ndarray, np.ndarray],
         k: int = TOP_K,
         patience: int = 5,
         min_delta: float = 1e-5,
@@ -665,7 +665,7 @@ class RankingCheckpoint(tf.keras.callbacks.Callback):
         self.best_epoch = 0
         self.best_weights = None
         self.wait = 0
-        self.history: Dict[int, float] = {}
+        self.history: dict[int, float] = {}
 
     def on_epoch_end(self, epoch, logs=None):
         metricas = evaluate_ranking(
@@ -698,7 +698,7 @@ def evaluate_most_popular(
     train_pairs: pd.DataFrame,
     num_products: int,
     k: int = TOP_K,
-) -> Dict[str, float]:
+) -> dict[str, float]:
     """
     Baseline não personalizado: recomenda os itens mais populares no treino.
 
@@ -725,7 +725,7 @@ def evaluate_most_popular(
 
 def evaluate_random_baseline(
     test_pairs: pd.DataFrame, train_pairs: pd.DataFrame, num_products: int, k: int = TOP_K
-) -> Dict[str, float]:
+) -> dict[str, float]:
     """
     Esperança analítica do recomendador aleatório (candidatos = itens não vistos).
     """
@@ -757,7 +757,7 @@ def recommend_products(
     df: pd.DataFrame,
     customer_encoder,
     product_encoder,
-    catalog: Tuple[np.ndarray, np.ndarray, np.ndarray],
+    catalog: tuple[np.ndarray, np.ndarray, np.ndarray],
     top_k: int = TOP_K,
     popularity: np.ndarray | None = None,
     alpha: float = 0.0,

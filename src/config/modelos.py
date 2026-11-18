@@ -1,5 +1,4 @@
 import pandas as pd
-
 from sklearn.compose import TransformedTargetRegressor
 from sklearn.model_selection import KFold, cross_validate
 from sklearn.pipeline import Pipeline
@@ -55,7 +54,7 @@ def organiza_resultados(resultados):
 
     for chave, valor in resultados.items():
         resultados[chave]["time_seconds"] = (
-            resultados[chave]["fit_time"] + resultados[chave]["score_time"]
+            valor["fit_time"] + valor["score_time"]
         )
 
     df_resultados = (

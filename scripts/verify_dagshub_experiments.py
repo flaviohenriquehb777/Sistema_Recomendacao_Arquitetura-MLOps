@@ -4,13 +4,15 @@ Script para verificar se os experimentos estão aparecendo no DagsHub
 """
 
 import sys
+from datetime import datetime
+
 import mlflow
 import requests
-from datetime import datetime
 
 # Adicionar src ao path
 sys.path.append('src')
 from config.dagshub_config import setup_dagshub_mlflow
+
 
 def verify_dagshub_experiments():
     """
@@ -42,7 +44,7 @@ def verify_dagshub_experiments():
             if len(runs) > 0:
                 print("   📈 Últimas métricas:")
                 for idx, run in runs.head(3).iterrows():
-                    print(f"      • Run: {run['tags.mlflow.runName'] if 'tags.mlflow.runName' in run else 'N/A'}")
+                    print(f"      • Run: {run.get('tags.mlflow.runName', 'N/A')}")
                     
                     # Mostrar algumas métricas principais
                     metrics_to_show = ['mse', 'precision_at_5', 'final_test_mse', 'final_test_mae']

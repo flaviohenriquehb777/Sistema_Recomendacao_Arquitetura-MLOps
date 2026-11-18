@@ -4,9 +4,9 @@ Configuração para integração com DagsHub e MLflow
 """
 
 import os
-import mlflow
+
 import dagshub
-from typing import Optional
+import mlflow
 
 # Configurações do DagsHub
 DAGSHUB_REPO_OWNER = os.getenv("DAGSHUB_REPO_OWNER", "flaviohenriquehb777")
@@ -35,7 +35,7 @@ def setup_dagshub_mlflow(experiment_name: str = "sistema_recomendacao") -> bool:
         # Configurar experimento
         mlflow.set_experiment(experiment_name)
         
-        print(f"✅ DagsHub e MLflow configurados com sucesso!")
+        print("✅ DagsHub e MLflow configurados com sucesso!")
         print(f"📊 Tracking URI: {mlflow_tracking_uri}")
         print(f"🧪 Experimento: {experiment_name}")
         
@@ -51,7 +51,7 @@ def log_model_experiment(
     model,
     metrics: dict,
     params: dict,
-    artifacts: Optional[dict] = None
+    artifacts: dict | None = None
 ) -> None:
     """
     Registra um experimento completo no MLflow
@@ -98,7 +98,7 @@ def log_model_experiment(
     except Exception as e:
         print(f"❌ Erro ao registrar experimento: {e}")
 
-def get_best_model_from_experiments(experiment_name: str, metric_name: str = "mse") -> Optional[str]:
+def get_best_model_from_experiments(experiment_name: str, metric_name: str = "mse") -> str | None:
     """
     Obtém o melhor modelo de um experimento baseado em uma métrica
     
@@ -124,7 +124,7 @@ def get_best_model_from_experiments(experiment_name: str, metric_name: str = "ms
         if len(runs) > 0:
             best_run_id = runs.iloc[0]['run_id']
             best_metric = runs.iloc[0][f'metrics.{metric_name}']
-            print(f"🏆 Melhor modelo encontrado:")
+            print("🏆 Melhor modelo encontrado:")
             print(f"   Run ID: {best_run_id}")
             print(f"   {metric_name.upper()}: {best_metric}")
             return best_run_id

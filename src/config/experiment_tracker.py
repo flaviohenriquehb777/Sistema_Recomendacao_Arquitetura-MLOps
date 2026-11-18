@@ -3,17 +3,18 @@
 Módulo para tracking de experimentos no DagsHub/MLflow
 """
 
-import os
-import mlflow
-import mlflow.tensorflow
-import mlflow.sklearn
-import dagshub
-import pandas as pd
-import numpy as np
-from typing import Dict, Any, List, Optional
 import json
-from datetime import datetime
 import logging
+import os
+from datetime import datetime
+from typing import Any
+
+import dagshub
+import mlflow
+import mlflow.sklearn
+import mlflow.tensorflow
+import numpy as np
+import pandas as pd
 
 # Configurar logging
 logging.basicConfig(level=logging.INFO)
@@ -53,7 +54,7 @@ class ExperimentTracker:
             logger.warning(f"Erro ao configurar tracking: {e}")
             logger.info("Continuando sem tracking remoto...")
     
-    def start_run(self, run_name: str = None) -> str:
+    def start_run(self, run_name: str | None = None) -> str:
         """
         Iniciar uma nova execução
         
@@ -72,7 +73,7 @@ class ExperimentTracker:
         logger.info(f"✓ Execução iniciada: {run_name} (ID: {run_id})")
         return run_id
     
-    def log_params(self, params: Dict[str, Any]):
+    def log_params(self, params: dict[str, Any]):
         """
         Registrar parâmetros do modelo
         
@@ -86,7 +87,7 @@ class ExperimentTracker:
         except Exception as e:
             logger.error(f"Erro ao registrar parâmetros: {e}")
     
-    def log_metrics(self, metrics: Dict[str, float], step: int = None):
+    def log_metrics(self, metrics: dict[str, float], step: int | None = None):
         """
         Registrar métricas do modelo
         
@@ -122,7 +123,7 @@ class ExperimentTracker:
         except Exception as e:
             logger.error(f"Erro ao registrar modelo: {e}")
     
-    def log_artifact(self, artifact_path: str, artifact_name: str = None):
+    def log_artifact(self, artifact_path: str, artifact_name: str | None = None):
         """
         Registrar artefato
         
@@ -231,7 +232,7 @@ class ExperimentTracker:
             logger.error(f"Erro ao obter execuções: {e}")
             return pd.DataFrame()
     
-    def get_best_run(self, metric_name: str, ascending: bool = True) -> Optional[Dict]:
+    def get_best_run(self, metric_name: str, ascending: bool = True) -> dict | None:
         """
         Obter a melhor execução baseada em uma métrica
         
@@ -257,7 +258,7 @@ class ExperimentTracker:
             logger.error(f"Erro ao obter melhor execução: {e}")
             return None
     
-    def compare_runs(self, run_ids: List[str]) -> pd.DataFrame:
+    def compare_runs(self, run_ids: list[str]) -> pd.DataFrame:
         """
         Comparar múltiplas execuções
         

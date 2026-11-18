@@ -4,25 +4,25 @@ Script para criar modelo ensemble combinando diferentes arquiteturas de recomend
 Implementa múltiplas abordagens e combina suas predições para maximizar a performance.
 """
 
-import sys
 import os
-import tensorflow as tf
-import pandas as pd
-import numpy as np
-from datetime import datetime
 import warnings
+
+import numpy as np
+import pandas as pd
+import tensorflow as tf
+
 warnings.filterwarnings('ignore')
 
-from sklearn.preprocessing import LabelEncoder, MinMaxScaler
-from sklearn.model_selection import train_test_split
-from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score
-from sklearn.ensemble import RandomForestRegressor, GradientBoostingRegressor
-from sklearn.linear_model import Ridge
 import joblib
+from sklearn.ensemble import GradientBoostingRegressor, RandomForestRegressor
+from sklearn.linear_model import Ridge
+from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import LabelEncoder, MinMaxScaler
 
 # Importar utilitários personalizados
-from src.config.paths import DADOS_BRUTOS, DADOS_TRATADOS
-from src.config.auxiliares_ml import downcast_dataframe
+from src.config.paths import DADOS_TRATADOS
+
 
 def create_deep_model(num_customers, num_products, num_categories, num_subcategories, 
                      embedding_dim=64, dropout_rate=0.3):
@@ -287,7 +287,7 @@ class EnsembleRecommendationModel:
             ]
             
             if validation_data:
-                X_val_dl, X_val_ml, y_val = validation_data
+                X_val_dl, _X_val_ml, y_val = validation_data
                 validation_data_formatted = (X_val_dl, y_val)
             else:
                 validation_data_formatted = None
@@ -447,7 +447,7 @@ def main():
     num_categories = len(category_encoder.classes_)
     num_subcategories = len(subcategory_encoder.classes_)
     
-    print(f"Dimensões:")
+    print("Dimensões:")
     print(f"Clientes: {num_customers}")
     print(f"Produtos: {num_products}")
     print(f"Categorias: {num_categories}")
@@ -594,7 +594,7 @@ def main():
     def recomendar_produtos_ensemble(customer_name, df, ensemble, encoders, num_products=7):
         """Função para recomendar produtos usando ensemble."""
         
-        customer_encoder, product_encoder, category_encoder, subcategory_encoder, scaler = encoders
+        customer_encoder, product_encoder, category_encoder, subcategory_encoder, _scaler = encoders
         
         try:
             customer_id_enc = customer_encoder.transform([customer_name])[0]

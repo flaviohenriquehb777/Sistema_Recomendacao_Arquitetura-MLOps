@@ -3,10 +3,10 @@
 Script para sincronização com GitHub
 """
 
-import subprocess
-import sys
 import os
+import subprocess
 from datetime import datetime
+
 
 def run_command(command, description):
     """Executar comando e mostrar resultado"""
@@ -14,7 +14,7 @@ def run_command(command, description):
     print(f"Comando: {command}")
     
     try:
-        result = subprocess.run(command, shell=True, capture_output=True, text=True)
+        result = subprocess.run(command, check=False, shell=True, capture_output=True, text=True)
         
         if result.returncode == 0:
             print(f"✅ {description} - Sucesso")
@@ -74,13 +74,12 @@ def sync_to_github():
             success = False
             break
     
-    if success:
-        # Tentar push para main
-        if not run_command("git push origin main", "Enviar para GitHub (branch main)"):
-            # Se falhar, tentar master
-            print("⚠️ Push para 'main' falhou, tentando 'master'...")
-            if not run_command("git push origin master", "Enviar para GitHub (branch master)"):
-                success = False
+    # Tentar push para main (e, se o remote principal falhar, para master)
+    if success and not run_command("git push origin main", "Enviar para GitHub (branch main)"):
+        # Se falhar, tentar master
+        print("⚠️ Push para 'main' falhou, tentando 'master'...")
+        if not run_command("git push origin master", "Enviar para GitHub (branch master)"):
+            success = False
     
     if success:
         print("\n✅ Sincronização com GitHub concluída com sucesso!")
@@ -94,7 +93,7 @@ def setup_git_if_needed():
     print("\n⚙️ Verificando configuração do Git...")
     
     # Verificar se git está configurado
-    result = subprocess.run("git config --global user.name", shell=True, capture_output=True, text=True)
+    result = subprocess.run("git config --global user.name", check=False, shell=True, capture_output=True, text=True)
     if not result.stdout.strip():
         print("⚠️ Git não está configurado. Configure com:")
         print("git config --global user.name 'Seu Nome'")

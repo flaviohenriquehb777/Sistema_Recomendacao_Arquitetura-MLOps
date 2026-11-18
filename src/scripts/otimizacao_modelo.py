@@ -44,7 +44,7 @@ import pandas as pd
 import tensorflow as tf
 from sklearn.preprocessing import LabelEncoder
 
-from src.config.paths import DADOS_TRATADOS, MODELS_DIR
+from src.config.mlflow_tracking import log_run, setup_mlflow
 from src.config.model_utils import (
     RANDOM_SEED,
     TOP_K,
@@ -63,7 +63,7 @@ from src.config.model_utils import (
     train_ranking_model,
     train_validation_test_split,
 )
-from src.config.mlflow_tracking import log_run, setup_mlflow
+from src.config.paths import DADOS_TRATADOS, MODELS_DIR
 
 # Hiperparâmetros do recomendador (escolhidos por validação — ver docstring de
 # create_ranking_model sobre a necessidade de regularização forte neste dado).

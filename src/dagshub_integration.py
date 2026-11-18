@@ -4,6 +4,7 @@ Facilita o uso do DagsHub para rastreamento de experimentos MLflow e versionamen
 """
 
 import os
+
 import mlflow
 from dotenv import load_dotenv
 

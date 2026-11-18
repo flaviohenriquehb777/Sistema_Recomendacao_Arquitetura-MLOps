@@ -1,6 +1,5 @@
 import pandas as pd
 
-
 # DOWNCAST
 
 def downcast_dataframe(df: pd.DataFrame) -> pd.DataFrame:

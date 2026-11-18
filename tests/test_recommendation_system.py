@@ -3,13 +3,12 @@
 Testes para o sistema de recomendação
 """
 
-import unittest
-import numpy as np
-import pandas as pd
-import tempfile
 import os
 import sys
-from unittest.mock import patch, MagicMock
+import unittest
+
+import numpy as np
+import pandas as pd
 
 # Adicionar src ao path
 sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'src'))

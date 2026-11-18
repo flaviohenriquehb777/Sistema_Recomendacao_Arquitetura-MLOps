@@ -5,16 +5,15 @@ Script para popular o MLflow com experimentos históricos dos modelos
 
 import os
 import sys
-import mlflow
-import pandas as pd
-import numpy as np
 from datetime import datetime
-import joblib
-import tensorflow as tf
+
+import mlflow
+import numpy as np
 
 # Adicionar src ao path
 sys.path.append('src')
-from config.dagshub_config import setup_dagshub_mlflow, log_model_experiment
+from config.dagshub_config import setup_dagshub_mlflow
+
 
 def create_historical_experiments():
     """
@@ -142,7 +141,7 @@ def create_historical_experiments():
     for i, exp in enumerate(experiments, 1):
         print(f"\n📊 Criando experimento {i}/4: {exp['name']}")
         
-        with mlflow.start_run(run_name=exp['name']) as run:
+        with mlflow.start_run(run_name=exp['name']):
             # Log parameters
             for param, value in exp['params'].items():
                 if isinstance(value, (list, dict)):
@@ -196,7 +195,7 @@ def create_model_comparison_experiment():
     
     setup_dagshub_mlflow("comparacao_modelos")
     
-    with mlflow.start_run(run_name="comparacao_final_modelos") as run:
+    with mlflow.start_run(run_name="comparacao_final_modelos"):
         # Métricas comparativas
         comparison_metrics = {
             "baseline_mse": 0.85,

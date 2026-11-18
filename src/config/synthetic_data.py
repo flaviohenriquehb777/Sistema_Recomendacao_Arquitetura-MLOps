@@ -48,8 +48,6 @@ Todas as funções são determinísticas (semente fixa) e não alteram a base re
 """
 from __future__ import annotations
 
-from typing import Dict
-
 import numpy as np
 import pandas as pd
 
@@ -80,7 +78,7 @@ def build_latent_factors(
     item_noise: float = 0.35,
     user_noise: float = 0.35,
     seed: int = RANDOM_SEED,
-) -> Dict[str, np.ndarray]:
+) -> dict[str, np.ndarray]:
     """
     Constrói os fatores latentes (usuários, itens, popularidade) do gerador.
 

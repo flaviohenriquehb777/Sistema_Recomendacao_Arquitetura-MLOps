@@ -97,3 +97,16 @@ package = false
 required-environments = [
     "sys_platform == 'win32' and platform_machine == 'AMD64'",
 ]
+
+[tool.ruff]
+# Alinha o alvo do ruff ao requires-python (>=3.11), para que as regras de
+# modernização de tipagem (UP) sugiram com segurança `dict`/`list`/`tuple` e
+# `X | None` em vez das formas legadas de `typing`.
+target-version = "py311"
+
+[tool.ruff.lint]
+# BLE001 (blind-except): a integração com MLflow/DagsHub é NÃO-BLOQUEANTE por
+# design. Qualquer falha de tracking (rede, credencial, backend indisponível)
+# deve ser registrada e ignorada para nunca derrubar o pipeline de ML — por isso
+# os wrappers de tracking usam `except Exception` de forma intencional.
+ignore = ["BLE001"]

@@ -15,10 +15,11 @@ O tracking é OPCIONAL e NÃO-BLOQUEANTE:
 import os
 import re
 from pathlib import Path
+
 import mlflow
 import mlflow.keras
-from mlflow.models import infer_signature
 from dotenv import load_dotenv
+from mlflow.models import infer_signature
 
 from src.config.paths import PROJECT_ROOT
 

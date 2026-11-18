@@ -3,11 +3,10 @@
 Script para sincronização com DagsHub
 """
 
+import os
 import subprocess
 import sys
-import os
-import json
-from datetime import datetime
+
 
 def run_command(command, description):
     """Executar comando e mostrar resultado"""
@@ -15,7 +14,7 @@ def run_command(command, description):
     print(f"Comando: {command}")
     
     try:
-        result = subprocess.run(command, shell=True, capture_output=True, text=True)
+        result = subprocess.run(command, check=False, shell=True, capture_output=True, text=True)
         
         if result.returncode == 0:
             print(f"✅ {description} - Sucesso")
@@ -64,7 +63,7 @@ def check_dagshub_config():
         return False
     
     # Verificar se o remote dagshub está configurado
-    result = subprocess.run("dvc remote list", shell=True, capture_output=True, text=True)
+    result = subprocess.run("dvc remote list", check=False, shell=True, capture_output=True, text=True)
     if "dagshub" in result.stdout:
         print("✅ Remote DagsHub configurado")
     else:
@@ -212,7 +211,7 @@ def check_environment():
     print("\n🔍 Verificando ambiente...")
     
     # Verificar se DVC está instalado
-    result = subprocess.run("dvc version", shell=True, capture_output=True, text=True)
+    result = subprocess.run("dvc version", check=False, shell=True, capture_output=True, text=True)
     if result.returncode == 0:
         print(f"✅ DVC instalado: {result.stdout.strip()}")
     else:

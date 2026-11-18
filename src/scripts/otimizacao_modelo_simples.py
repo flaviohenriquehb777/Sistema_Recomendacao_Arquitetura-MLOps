@@ -4,22 +4,22 @@ Script simplificado para otimização avançada do modelo de recomendação.
 Implementa técnicas avançadas para maximizar a performance do modelo sem MLflow.
 """
 
-import sys
 import os
-import tensorflow as tf
-import pandas as pd
-import numpy as np
-from datetime import datetime
 import warnings
+
+import numpy as np
+import pandas as pd
+import tensorflow as tf
+
 warnings.filterwarnings('ignore')
 
+from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
+from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import LabelEncoder, MinMaxScaler
-from sklearn.model_selection import train_test_split, KFold
-from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score
 
 # Importar utilitários personalizados
-from src.config.paths import DADOS_BRUTOS, DADOS_TRATADOS
-from src.config.auxiliares_ml import downcast_dataframe
+from src.config.paths import DADOS_TRATADOS
+
 
 def create_model_with_regularization(num_customers, num_products, num_categories, num_subcategories, 
                                    embedding_dim=50, l2_strength=0.001, dropout_rate=0.2, learning_rate=0.001):
@@ -282,7 +282,7 @@ def main():
     num_categories = len(category_encoder.classes_)
     num_subcategories = len(subcategory_encoder.classes_)
     
-    print(f"Dimensões dos embeddings:")
+    print("Dimensões dos embeddings:")
     print(f"Clientes: {num_customers}")
     print(f"Produtos: {num_products}")
     print(f"Categorias: {num_categories}")
@@ -355,7 +355,7 @@ def main():
     )
     
     # Treinar
-    history = final_model.fit(
+    final_model.fit(
         [customer_train.reshape(-1, 1), product_train.reshape(-1, 1), 
          category_train.reshape(-1, 1), subcategory_train.reshape(-1, 1)],
         sales_train,
