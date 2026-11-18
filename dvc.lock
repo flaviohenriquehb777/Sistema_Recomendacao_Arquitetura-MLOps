@@ -27,6 +27,10 @@ stages:
   benchmark_sintetico:
     cmd: python -m src.scripts.benchmark_sintetico
     deps:
+    - path: src/config/mlflow_tracking.py
+      hash: md5
+      md5: 92229466cb8179cb2f02819b5e971a38
+      size: 9307
     - path: src/config/model_utils.py
       hash: md5
       md5: dd3088e8f11b949a8f604f7e1f66dfd5
@@ -41,8 +45,8 @@ stages:
       size: 10132
     - path: src/scripts/benchmark_sintetico.py
       hash: md5
-      md5: fcea35fc39711d8cd8b2ab43a639b6cb
-      size: 11380
+      md5: a4022686ac0d9e99dfd9ed1acab31c56
+      size: 12928
     outs:
     - path: dados/benchmark_sintetico.parquet
       hash: md5
@@ -65,8 +69,8 @@ stages:
       size: 862
     - path: src/config/mlflow_tracking.py
       hash: md5
-      md5: 034cb37617efb2a065b9cdb49ebe5b11
-      size: 7358
+      md5: 92229466cb8179cb2f02819b5e971a38
+      size: 9307
     - path: src/config/model_utils.py
       hash: md5
       md5: dd3088e8f11b949a8f604f7e1f66dfd5
@@ -77,12 +81,12 @@ stages:
       size: 916
     - path: src/scripts/otimizacao_modelo.py
       hash: md5
-      md5: 1a9792e0431fa135451cbd343653e381
-      size: 10168
+      md5: 06f1e859f6d382807a57781dd42838d7
+      size: 10469
     outs:
     - path: models/best_model_recomendacao_otimizado.keras
       hash: md5
-      md5: c06906c5e8172c1c0b0a46a17cb93028
+      md5: 9596c7aa9cb5a3704b242454b52672e7
       size: 1195566
     - path: models/category_encoder_otimizado.pkl
       hash: md5

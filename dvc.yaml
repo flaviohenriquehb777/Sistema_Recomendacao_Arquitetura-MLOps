@@ -60,6 +60,7 @@ stages:
       - src/scripts/benchmark_sintetico.py
       - src/config/synthetic_data.py
       - src/config/model_utils.py
+      - src/config/mlflow_tracking.py
       - src/config/paths.py
     outs:
       - dados/benchmark_sintetico.parquet

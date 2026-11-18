@@ -63,7 +63,7 @@ from src.config.model_utils import (
     train_ranking_model,
     train_validation_test_split,
 )
-from src.config.mlflow_tracking import log_model_metrics, setup_mlflow
+from src.config.mlflow_tracking import log_run, setup_mlflow
 
 # Hiperparâmetros do recomendador (escolhidos por validação — ver docstring de
 # create_ranking_model sobre a necessidade de regularização forte neste dado).
@@ -203,10 +203,20 @@ def main() -> None:
         "ndcg_baseline_populares": metricas_populares[f"ndcg@{TOP_K}"],
         "ganho_ndcg_sobre_populares": float(ganho_pop),
     }
-    run_id = log_model_metrics(
-        modelo, to_model_inputs(tc[:128], tp[:128], catalog), ty[:128],
-        metricas_log, model_name="recomendador_neumf",
-    )
+    params_log = {
+        "base": "sc_base_01_real",
+        "embedding_dim": EMBEDDING_DIM,
+        "l2_strength": L2_STRENGTH,
+        "dropout": DROPOUT,
+        "n_negatives": N_NEGATIVES,
+        "epochs_max": EPOCHS,
+        "batch_size": BATCH_SIZE,
+        "patience": PATIENCE,
+        "top_k": TOP_K,
+        "num_clientes": num_clientes,
+        "num_produtos": num_produtos,
+    }
+    run_id = log_run(params_log, metricas_log, run_name="producao_neumf_hibrido")
     if run_id:
         print(f"Registrado no MLflow. Run ID: {run_id}")
     else:
