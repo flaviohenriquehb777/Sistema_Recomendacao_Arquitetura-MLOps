@@ -51,6 +51,7 @@ from src.config.model_utils import (
     train_validation_test_split,
 )
 from src.config.paths import DATA_DIR, REPORTS_DIR
+from src.config.mlflow_tracking import log_run, setup_mlflow
 from src.config.synthetic_data import dataset_summary, generate_synthetic_dataset
 
 # Escala do benchmark (base sintética — ver docstring do gerador).
@@ -112,6 +113,10 @@ def main() -> None:
     print("=" * 70)
     print("BENCHMARK DE ESCALA SOBRE BASE SINTÉTICA (NeuMF + híbrido)")
     print("=" * 70)
+
+    # Tracking MLflow (não-bloqueante). Experimento PRÓPRIO do benchmark, para
+    # separar a demonstração de escala (base sintética) do modelo de produção.
+    setup_mlflow(experiment_name="recomendacao_benchmark_escala")
 
     # --- Base sintética (reprodutível) ---------------------------------------
     # Regenera sempre (geração determinística, seed fixa) para manter os fatores
@@ -256,6 +261,39 @@ def main() -> None:
     caminho_json = REPORTS_DIR / "benchmark_sintetico_metricas.json"
     caminho_json.write_text(json.dumps(saida, indent=2, ensure_ascii=False), encoding="utf-8")
     print(f"\nMétricas salvas em: {caminho_json}")
+
+    # --- Registro no MLflow (não-bloqueante) ---------------------------------
+    params_log = {
+        "base": "sintetica_reprodutivel",
+        "n_users": N_USERS,
+        "n_items": N_ITEMS,
+        "avg_interactions": AVG_INTERACTIONS,
+        "embedding_dim": EMBEDDING_DIM,
+        "l2_strength": L2_STRENGTH,
+        "dropout": DROPOUT,
+        "n_negatives": N_NEGATIVES,
+        "epochs_max": EPOCHS,
+        "batch_size": BATCH_SIZE,
+        "patience": PATIENCE,
+        "top_k": TOP_K,
+        "alpha_hibrido": float(alpha),
+        "modelo_final": nome_final,
+    }
+    metrics_log = {
+        **{f"final_{chave}": valor for chave, valor in metricas_final.items()},
+        **{f"popular_{chave}": valor for chave, valor in metricas_populares.items()},
+        **{f"oracle_{chave}": valor for chave, valor in metricas_oracle.items()},
+        "val_ndcg_final": float(val_final),
+        "ganho_ndcg_sobre_populares": float(ganho_pop),
+    }
+    run_id = log_run(
+        params_log, metrics_log, artifacts=[caminho_json],
+        run_name="benchmark_escala_sintetico",
+    )
+    if run_id:
+        print(f"Registrado no MLflow. Run ID: {run_id}")
+    else:
+        print("Tracking MLflow indisponível — benchmark seguiu normalmente.")
 
     print("\nBENCHMARK CONCLUÍDO COM SUCESSO.")
 

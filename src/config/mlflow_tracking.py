@@ -49,16 +49,21 @@ MLFLOW_TRACKING_URI = os.getenv(
     "RECOMENDACAO_MLFLOW_TRACKING_URI", f"sqlite:///{MLFLOW_DB_PATH.as_posix()}"
 )
 
-def setup_mlflow():
+def setup_mlflow(experiment_name: str | None = None):
     """
     Configura o MLflow com o URI de rastreamento.
 
     Não levanta exceção: em caso de falha, avisa e retorna None para que o
     treino prossiga sem tracking.
 
+    Args:
+        experiment_name: nome do experimento a ativar. Se None, usa o
+            experimento padrão do projeto (``RECOMENDACAO_MLFLOW_EXPERIMENT``).
+
     Returns:
         str | None: URI efetiva de tracking em caso de sucesso; None se falhar.
     """
+    nome_experimento = experiment_name or MLFLOW_EXPERIMENT_NAME
     try:
         if MLFLOW_TRACKING_URI.startswith("file:"):
             MLRUNS_DIR.mkdir(parents=True, exist_ok=True)
@@ -73,15 +78,54 @@ def setup_mlflow():
                 os.environ["MLFLOW_TRACKING_PASSWORD"] = token
         mlflow.set_tracking_uri(MLFLOW_TRACKING_URI)
         # Garante que o experimento exista e esteja ativo (evita "experiment ID 0").
-        if mlflow.get_experiment_by_name(MLFLOW_EXPERIMENT_NAME) is None:
-            mlflow.create_experiment(MLFLOW_EXPERIMENT_NAME)
-        mlflow.set_experiment(MLFLOW_EXPERIMENT_NAME)
+        if mlflow.get_experiment_by_name(nome_experimento) is None:
+            mlflow.create_experiment(nome_experimento)
+        mlflow.set_experiment(nome_experimento)
         tracking_uri = mlflow.get_tracking_uri()
-        print(f"MLflow configurado com URI: {tracking_uri} | Experimento: {MLFLOW_EXPERIMENT_NAME}")
+        print(f"MLflow configurado com URI: {tracking_uri} | Experimento: {nome_experimento}")
         return tracking_uri
     except Exception as e:
         print(f"[aviso] Falha ao configurar o MLflow ({e}). Continuando sem tracking.")
         return None
+
+def log_run(params: dict, metrics: dict, artifacts=None, run_name="run"):
+    """
+    Registra **parâmetros**, **métricas** e (opcionalmente) **artefatos** de um
+    run — SEM registrar o modelo no Model Registry.
+
+    Indicada para estágios que não precisam versionar o modelo neural (ex.: o
+    benchmark de escala sobre a base sintética).
+
+    Não-bloqueante: qualquer falha (servidor indisponível, valor inválido, etc.)
+    é avisada e ignorada, sem interromper o pipeline.
+
+    Args:
+        params: dicionário de parâmetros/metadados (valores escalares).
+        metrics: dicionário de métricas numéricas.
+        artifacts: iterável de caminhos de arquivos a anexar ao run.
+        run_name: nome do run.
+
+    Returns:
+        str | None: run ID em caso de sucesso; None se o tracking falhar.
+    """
+    try:
+        with mlflow.start_run(run_name=run_name) as run:
+            for chave, valor in (params or {}).items():
+                if isinstance(valor, (str, int, float, bool)):
+                    mlflow.log_param(_sanitize_name(chave), valor)
+                else:
+                    mlflow.log_param(_sanitize_name(chave), str(valor))
+            for chave, valor in (metrics or {}).items():
+                mlflow.log_metric(_sanitize_name(chave), float(valor))
+            for caminho in (artifacts or []):
+                if Path(caminho).exists():
+                    mlflow.log_artifact(str(caminho))
+            print(f"Run '{run_name}' registrado no MLflow. Run ID: {run.info.run_id}")
+            return run.info.run_id
+    except Exception as e:
+        print(f"[aviso] Falha ao registrar o run no MLflow ({e}). Continuando sem tracking.")
+        return None
+
 
 def log_model_metrics(model, X_test, y_test, metrics_dict, model_name="recommendation_model"):
     """
