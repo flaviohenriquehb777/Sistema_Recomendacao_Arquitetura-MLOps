@@ -7,6 +7,7 @@
 #                       └──> treinamento_ensemble
 #
 #     benchmark_sintetico  (ramo independente — base sintética reproduzível)
+#     benchmark_publico_sc_base_03  (ramo independente — base pública REAL)
 #
 # Cada estágio declara as dependências de código (scripts/config) e de dados,
 # garantindo que o DVC só re-execute o necessário quando algo mudar.
@@ -66,4 +67,23 @@ stages:
       - dados/benchmark_sintetico.parquet
     metrics:
       - report/benchmark_sintetico_metricas.json:
+          cache: false
+
+  benchmark_publico_sc_base_03:
+    desc: "Benchmark sobre a base pública REAL sc_base_03 (NeuMF + baselines, sem teto oracle)."
+    cmd: python -m src.scripts.benchmark_sc_base_03
+    deps:
+      - src/scripts/benchmark_sc_base_03.py
+      - src/config/sc_base_03_data.py
+      - src/config/model_utils.py
+      - src/config/mlflow_tracking.py
+      - src/config/paths.py
+      - dados/sc_base_03/events.csv
+      - dados/sc_base_03/item_properties_part1.csv
+      - dados/sc_base_03/item_properties_part2.csv
+      - dados/sc_base_03/category_tree.csv
+    outs:
+      - dados/benchmark_sc_base_03.parquet
+    metrics:
+      - report/benchmark_sc_base_03_metricas.json:
           cache: false
