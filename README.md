@@ -27,6 +27,7 @@
 - [Processo de Desenvolvimento](#processo-de-desenvolvimento)
 - [Resultados (base real Superstore)](#resultados-base-real-superstore)
 - [Benchmark de Escala (base sintética)](#benchmark-de-escala-base-sintética-rotulada)
+- [Benchmark em Base Pública Real (RetailRocket)](#benchmark-em-base-pública-real-retailrocket)
 - [Explicabilidade (SHAP)](#explicabilidade-shap)
 - [Ambiente MLOps](#ambiente-mlops)
 - [Estrutura do Repositório](#estrutura-do-repositório)
@@ -229,6 +230,42 @@ Métricas de **teste** (*leave-last-out*, catálogo completo, `k = 7`):
 
 > **Reprodutibilidade:** notebook [`08_777_Benchmark_Escala_Sintetico.ipynb`](notebooks/08_777_Benchmark_Escala_Sintetico.ipynb) · script `python -m src.scripts.benchmark_sintetico` · métricas em [`report/benchmark_sintetico_metricas.json`](report/benchmark_sintetico_metricas.json) · figura em `report/figuras/benchmark_escala_ndcg.png`.
 
+## Benchmark em Base Pública Real (RetailRocket)
+
+> **Aviso de honestidade.** A base desta seção é **real** — o *log de eventos* público da **RetailRocket** (Kaggle, `retailrocket/ecommerce-dataset`), com *feedback* implícito de verdade (`view`, `addtocart`, `transaction`). Ela é **anonimizada** (sem nomes de produto/cliente) e recebe **filtros explícitos de tratabilidade** (itens/usuários relevantes + amostra determinística, `src/config/retailrocket_data.py`). Por ser dado real, **não existe "teto oracle"** (não há fator latente verdadeiro conhecido).
+
+A base sintética prova que o método funciona quando **construímos** o sinal — o que é, em alguma medida, circular. A RetailRocket fecha essa lacuna: é um e-commerce **real**, com sinal implícito que o sistema não controla. Aqui o mesmo pipeline é executado sobre dado real de outra origem, sem qualquer ajuste de código.
+
+<div align="center">
+
+| Base RetailRocket (após filtros) | Valor |
+|:--|--:|
+| Interações | 92.907 |
+| Clientes / Produtos | 5.000 / 3.745 |
+| Categorias / Subcategorias | 431 / 431 |
+| Itens por cliente (média / mediana) | 10,2 / 6 |
+| Densidade da matriz cliente × produto | 0,50 % |
+| Filtros | itens ≥ 100 eventos · usuários ≥ 5 itens · amostra de 5.000 clientes |
+
+</div>
+
+Métricas de **teste** (*leave-last-out*, catálogo completo, `k = 7`):
+
+<div align="center">
+
+| Política | NDCG@7 | MAP@7 | HitRate@7 | Precision@7 | Recall@7 | F1@7 |
+|:--|--:|--:|--:|--:|--:|--:|
+| **Híbrido popularity-first (α = 1,0) — modelo final** | **0,0541** | **0,0409** | **0,0962** | **0,0137** | **0,0962** | **0,0241** |
+| NeuMF puro | 0,0457 | 0,0344 | 0,0820 | 0,0117 | 0,0820 | 0,0205 |
+| Mais-populares (*baseline*) | 0,0117 | 0,0085 | 0,0218 | 0,0031 | 0,0218 | 0,0055 |
+| Aleatório (esperança) | — | — | 0,0019 | 0,0003 | 0,0019 | — |
+
+</div>
+
+**Leitura sênior.** Em dado real e anonimizado, o modelo **supera o *baseline* de popularidade em +363,5 % de NDCG@7** (0,0541 vs. 0,0117) — quase **1 em cada 10** clientes recebe o item relevante no top-7 (Hit-Rate@7 = 9,6 %, contra 2,2 % dos mais-populares e 0,19 % do aleatório). Diferente da base Superstore (onde o híbrido colapsa em popularidade, `α = 0`), aqui a validação escolhe o **híbrido com personalização plena** (`α = 1,0`) — a rede de fato aprende preferências individuais. O ganho do NeuMF puro (0,0457) sobre a popularidade (0,0117) é a evidência de que **há sinal colaborativo real** capturado pelo modelo; o híbrido o reforça somando o *prior* de popularidade.
+
+**Reprodutibilidade:** script `python -m src.scripts.benchmark_retailrocket` (estágio DVC `benchmark_publico_retailrocket`) · métricas em [`report/benchmark_retailrocket_metricas.json`](report/benchmark_retailrocket_metricas.json). Os CSVs brutos (~1 GB) são baixados do Kaggle (`kaggle datasets download -d retailrocket/ecommerce-dataset -p dados/retailrocket --unzip`) e não são versionados.
+
 ## Explicabilidade (SHAP)
 
 O SHAP é aplicado ao *score* da NeuMF para medir a contribuição de cada entrada. Como a rede é multi-entrada (IDs), a análise é feita sobre os quatro campos (cliente, produto, categoria, subcategoria). Os resultados (notebook `05`) são consistentes entre **três evidências independentes**:
@@ -281,12 +318,14 @@ Sistema_Recomendacao_Arquitetura-MLOps/
 │   │   ├── mlflow_tracking.py # Setup do MLflow (SQLite/DagsHub) e registro
 │   │   ├── paths.py           # Caminhos canônicos do projeto
 │   │   ├── synthetic_data.py  # Gerador de base sintética (benchmark de escala)
+│   │   ├── retailrocket_data.py # Preparo da base pública RetailRocket (benchmark real)
 │   │   └── auxiliares*.py     # Utilitários de dados/plot
 │   └── scripts/
 │       ├── preparar_dados.py      # CSV → Parquet tratado
 │       ├── otimizacao_modelo.py   # Treino do híbrido + métricas + MLflow
 │       ├── modelo_ensemble.py     # Ensemble (estágio complementar)
-│       └── benchmark_sintetico.py # Benchmark de escala (base sintética)
+│       ├── benchmark_sintetico.py # Benchmark de escala (base sintética)
+│       └── benchmark_retailrocket.py # Benchmark em base pública real (RetailRocket)
 ├── tests/                     # pytest (utilidades do modelo e do sistema)
 ├── report/                    # Figuras SHAP/benchmark e relatório PDF
 ├── docs/                      # Guias (OPTIMIZATION_GUIDE.md, SYNC_GUIDE.md)
@@ -348,7 +387,7 @@ A suíte cobre as utilidades do modelo (criação da NeuMF, prior de popularidad
 - **Reprodutibilidade:** todas as funções usam sementes fixas (`RANDOM_SEED = 42`), o ambiente é congelado pelo `uv.lock` e os artefatos são versionados pelo DVC.
 - **Credenciais isoladas:** o rastreamento usa variáveis **próprias do projeto** para não herdar configuração de outros repositórios.
 - **Limitação honesta:** o desempenho é limitado pelo tamanho e pela esparsidade da base; o pipeline de ranking, a metodologia de avaliação e a explicabilidade estão prontos para escalar com mais dados.
-- **Duas bases, dois papéis:** a base **real** (Superstore) valida o **sistema de produção** (ETL, DVC, MLflow, SHAP, cold start) e expõe sua limitação honesta; o **benchmark sintético rotulado** valida o **método em escala** (supera o *baseline* de popularidade em +431,7 % de NDCG@7).
+- **Três bases, três papéis:** a base **real** (Superstore) valida o **sistema de produção** (ETL, DVC, MLflow, SHAP, cold start) e expõe sua limitação honesta; o **benchmark sintético rotulado** valida o **método em escala** (+431,7 % de NDCG@7 sobre a popularidade); e o **benchmark em base pública real (RetailRocket)** prova que o **mesmo pipeline generaliza para dado real de outra origem** (+363,5 % de NDCG@7 sobre a popularidade, com personalização plena `α = 1,0`).
 
 ## Licença
 

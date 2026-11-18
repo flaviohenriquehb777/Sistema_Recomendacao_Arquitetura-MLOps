@@ -133,3 +133,51 @@ stages:
       md5: e52955981f715da48b2229c431442061.dir
       size: 76640766
       nfiles: 12
+  benchmark_publico_retailrocket:
+    cmd: python -m src.scripts.benchmark_retailrocket
+    deps:
+    - path: dados/retailrocket/category_tree.csv
+      hash: md5
+      md5: f0e1eb878ae66209004112f6355d7e83
+      size: 14454
+    - path: dados/retailrocket/events.csv
+      hash: md5
+      md5: fddaf7c1c6a9df23a726500a08ffdd7e
+      size: 94237913
+    - path: dados/retailrocket/item_properties_part1.csv
+      hash: md5
+      md5: cb43a0682a1af76f1c1b60f9163ae47b
+      size: 484315749
+    - path: dados/retailrocket/item_properties_part2.csv
+      hash: md5
+      md5: e74ec953e7b192920b195dfd82dc2a4e
+      size: 408929907
+    - path: src/config/mlflow_tracking.py
+      hash: md5
+      md5: 92229466cb8179cb2f02819b5e971a38
+      size: 9307
+    - path: src/config/model_utils.py
+      hash: md5
+      md5: dd3088e8f11b949a8f604f7e1f66dfd5
+      size: 31654
+    - path: src/config/paths.py
+      hash: md5
+      md5: f2e208ddeaa910921910b6a75537bd59
+      size: 916
+    - path: src/config/retailrocket_data.py
+      hash: md5
+      md5: 3bb24aea36285a54a87bc5c1ee22e2e6
+      size: 8115
+    - path: src/scripts/benchmark_retailrocket.py
+      hash: md5
+      md5: 51cbb7a37239e52d5088f35c6e7107b7
+      size: 11555
+    outs:
+    - path: dados/benchmark_retailrocket.parquet
+      hash: md5
+      md5: e6b6e4301a39bbb9a0d6f43fda0c22c7
+      size: 1491364
+    - path: report/benchmark_retailrocket_metricas.json
+      hash: md5
+      md5: 2084cb94ebaacfb9089daafbf04073a6
+      size: 1998

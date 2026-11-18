@@ -1,2 +1,5 @@
 /dados_tratados.parquet
 /benchmark_sintetico.parquet
+/benchmark_retailrocket.parquet
+# CSVs brutos da base pública RetailRocket (~1 GB) — baixados do Kaggle, não versionados.
+/retailrocket/

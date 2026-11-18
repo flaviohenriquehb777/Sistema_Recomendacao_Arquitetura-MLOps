@@ -1,0 +1,70 @@
+{
+  "base": "retailrocket (publica, real, anonimizada)",
+  "filtros": {
+    "min_eventos_item": 100,
+    "min_itens_usuario": 5,
+    "max_clientes": 5000
+  },
+  "resumo_base": {
+    "interacoes": 92907,
+    "clientes": 5000,
+    "produtos": 3745,
+    "categorias": 431,
+    "subcategorias": 431,
+    "itens_por_cliente_media": 10.2456,
+    "itens_por_cliente_mediana": 6.0,
+    "densidade": 0.004961655540720962
+  },
+  "alpha_hibrido": 1.0,
+  "modelo_final": "híbrido popularity-first (alpha=1.0)",
+  "val_ndcg_final": 0.05795329406468654,
+  "val_ndcg_neumf": 0.05250386565717038,
+  "metricas_teste": {
+    "final": {
+      "ndcg@7": 0.05411380155406095,
+      "map@7": 0.04090047619047619,
+      "hit_rate@7": 0.0962,
+      "precision@7": 0.013742857142857142,
+      "recall@7": 0.0962,
+      "f1@7": 0.02405,
+      "num_customers": 5000.0,
+      "num_products": 3745.0
+    },
+    "hibrido": {
+      "ndcg@7": 0.05411380155406095,
+      "map@7": 0.04090047619047619,
+      "hit_rate@7": 0.0962,
+      "precision@7": 0.013742857142857142,
+      "recall@7": 0.0962,
+      "f1@7": 0.02405,
+      "num_customers": 5000.0,
+      "num_products": 3745.0
+    },
+    "neumf_puro": {
+      "ndcg@7": 0.045739767993269155,
+      "map@7": 0.03443380952380952,
+      "hit_rate@7": 0.082,
+      "precision@7": 0.011714285714285714,
+      "recall@7": 0.082,
+      "f1@7": 0.0205,
+      "num_customers": 5000.0,
+      "num_products": 3745.0
+    },
+    "mais_populares": {
+      "ndcg@7": 0.011675946177065535,
+      "map@7": 0.008531428571428572,
+      "hit_rate@7": 0.0218,
+      "precision@7": 0.003114285714285714,
+      "recall@7": 0.0218,
+      "f1@7": 0.00545,
+      "num_customers": 5000.0,
+      "num_products": 3745.0
+    },
+    "aleatorio": {
+      "hit_rate@7": 0.0018734209266360019,
+      "precision@7": 0.00026763156094799785,
+      "recall@7": 0.0018734209266359847
+    }
+  },
+  "ganho_ndcg_sobre_populares": 3.634639517297016
+}

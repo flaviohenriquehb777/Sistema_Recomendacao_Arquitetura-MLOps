@@ -7,6 +7,7 @@
 #                       └──> treinamento_ensemble
 #
 #     benchmark_sintetico  (ramo independente — base sintética reproduzível)
+#     benchmark_publico_retailrocket  (ramo independente — base pública REAL)
 #
 # Cada estágio declara as dependências de código (scripts/config) e de dados,
 # garantindo que o DVC só re-execute o necessário quando algo mudar.
@@ -66,4 +67,23 @@ stages:
       - dados/benchmark_sintetico.parquet
     metrics:
       - report/benchmark_sintetico_metricas.json:
+          cache: false
+
+  benchmark_publico_retailrocket:
+    desc: "Benchmark sobre a base pública REAL RetailRocket (NeuMF + baselines, sem teto oracle)."
+    cmd: python -m src.scripts.benchmark_retailrocket
+    deps:
+      - src/scripts/benchmark_retailrocket.py
+      - src/config/retailrocket_data.py
+      - src/config/model_utils.py
+      - src/config/mlflow_tracking.py
+      - src/config/paths.py
+      - dados/retailrocket/events.csv
+      - dados/retailrocket/item_properties_part1.csv
+      - dados/retailrocket/item_properties_part2.csv
+      - dados/retailrocket/category_tree.csv
+    outs:
+      - dados/benchmark_retailrocket.parquet
+    metrics:
+      - report/benchmark_retailrocket_metricas.json:
           cache: false
