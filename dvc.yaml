@@ -1,34 +1,68 @@
+# Pipeline DVC — Sistema de Recomendação (Sams Club)
+# ---------------------------------------------------------------------------
+# Grafo: preparacao_dados gera o parquet tratado, consumido em PARALELO por
+# treinamento_modelo e treinamento_ensemble (estágios independentes entre si):
+#
+#     preparacao_dados ──┬──> treinamento_modelo
+#                       └──> treinamento_ensemble
+#
+#     benchmark_sintetico  (ramo independente — base sintética reproduzível)
+#
+# Cada estágio declara as dependências de código (scripts/config) e de dados,
+# garantindo que o DVC só re-execute o necessário quando algo mudar.
+# ---------------------------------------------------------------------------
 stages:
-  data_preparation:
-    cmd: python src/scripts/otimizacao_modelo_simples.py
+
+  preparacao_dados:
+    desc: "Converte o CSV bruto em Parquet tratado (nulos de 'Postal Code' + downcast)."
+    cmd: python -m src.scripts.preparar_dados
     deps:
-    - src/scripts/otimizacao_modelo_simples.py
-    - dados/sc_base_01/sc_base_01_bruto.csv
+      - src/scripts/preparar_dados.py
+      - src/config/paths.py
+      - src/config/auxiliares_ml.py
+      - dados/sc_base_01/sc_base_01_bruto.csv
     outs:
-    - dados/dados_tratados.parquet
-    
-  model_training:
-    cmd: python src/scripts/otimizacao_modelo.py
+      - dados/dados_tratados.parquet
+
+  treinamento_modelo:
+    desc: "Treina o recomendador híbrido popularity-first (NeuMF + prior) e salva modelo + encoders."
+    cmd: python -m src.scripts.otimizacao_modelo
     deps:
-    - src/scripts/otimizacao_modelo.py
-    - dados/dados_tratados.parquet
+      - src/scripts/otimizacao_modelo.py
+      - src/config/paths.py
+      - src/config/auxiliares_ml.py
+      - src/config/model_utils.py
+      - src/config/mlflow_tracking.py
+      - dados/dados_tratados.parquet
     outs:
-    - models/best_model_recomendacao_otimizado.keras
-    - models/category_encoder_otimizado.pkl
-    - models/customer_encoder_otimizado.pkl
-    - models/product_encoder_otimizado.pkl
-    - models/sales_scaler_otimizado.pkl
-    - models/subcategory_encoder_otimizado.pkl
-    
-  ensemble_training:
-    cmd: python src/scripts/modelo_ensemble.py
+      - models/best_model_recomendacao_otimizado.keras
+      - models/hybrid_config_otimizado.pkl
+      - models/customer_encoder_otimizado.pkl
+      - models/product_encoder_otimizado.pkl
+      - models/category_encoder_otimizado.pkl
+      - models/subcategory_encoder_otimizado.pkl
+
+  treinamento_ensemble:
+    desc: "Treina o ensemble (deep learning + ML clássico) e salva em models/ensemble/."
+    cmd: python -m src.scripts.modelo_ensemble
     deps:
-    - src/scripts/modelo_ensemble.py
-    - models/best_model_recomendacao_otimizado.keras
-    - models/category_encoder_otimizado.pkl
-    - models/customer_encoder_otimizado.pkl
-    - models/product_encoder_otimizado.pkl
-    - models/sales_scaler_otimizado.pkl
-    - models/subcategory_encoder_otimizado.pkl
+      - src/scripts/modelo_ensemble.py
+      - src/config/paths.py
+      - src/config/auxiliares_ml.py
+      - dados/dados_tratados.parquet
     outs:
-    - models/ensemble/
+      - models/ensemble/
+
+  benchmark_sintetico:
+    desc: "Benchmark de escala sobre base sintética rotulada (NeuMF + baselines + teto oracle)."
+    cmd: python -m src.scripts.benchmark_sintetico
+    deps:
+      - src/scripts/benchmark_sintetico.py
+      - src/config/synthetic_data.py
+      - src/config/model_utils.py
+      - src/config/paths.py
+    outs:
+      - dados/benchmark_sintetico.parquet
+    metrics:
+      - report/benchmark_sintetico_metricas.json:
+          cache: false
