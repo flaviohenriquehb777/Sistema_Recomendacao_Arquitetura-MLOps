@@ -63,6 +63,11 @@ dependencies = [
     "seaborn>=0.13",
     "shap>=0.46",
     "reportlab>=4.0",
+    # --- Serviço de inferência (API REST) ---
+    # Já resolvidos como dependências transitivas no lock; promovidos a
+    # primeira classe por causa do serviço em `serving/`.
+    "fastapi>=0.115",
+    "uvicorn>=0.30",
     # --- MLOps: versionamento de dados (DVC) e rastreamento (MLflow/DagsHub) ---
     # dvc < 3.66 importa o privado `pathspec._DIR_MARK`, removido no pathspec >= 1.0.
     "dvc>=3.66",

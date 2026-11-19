@@ -3624,6 +3624,7 @@ dependencies = [
     { name = "dagshub" },
     { name = "dvc" },
     { name = "dvc-http" },
+    { name = "fastapi" },
     { name = "ipykernel" },
     { name = "isort" },
     { name = "joblib" },
@@ -3648,6 +3649,7 @@ dependencies = [
     { name = "shap" },
     { name = "tensorflow" },
     { name = "tqdm" },
+    { name = "uvicorn" },
 ]
 
 [package.metadata]
@@ -3656,6 +3658,7 @@ requires-dist = [
     { name = "dagshub", specifier = ">=0.5" },
     { name = "dvc", specifier = ">=3.66" },
     { name = "dvc-http", specifier = ">=2.32" },
+    { name = "fastapi", specifier = ">=0.115" },
     { name = "ipykernel", specifier = ">=6.29" },
     { name = "isort", specifier = ">=5.13" },
     { name = "joblib", specifier = ">=1.4" },
@@ -3680,6 +3683,7 @@ requires-dist = [
     { name = "shap", specifier = ">=0.46" },
     { name = "tensorflow", specifier = "==2.19.0" },
     { name = "tqdm", specifier = ">=4.66" },
+    { name = "uvicorn", specifier = ">=0.30" },
 ]
 
 [[package]]

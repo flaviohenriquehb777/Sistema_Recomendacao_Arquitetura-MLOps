@@ -10,8 +10,10 @@
 [![DVC](https://img.shields.io/badge/DVC-Enabled-blue.svg)](https://dvc.org/)
 [![MLflow](https://img.shields.io/badge/MLflow-Tracking-blue.svg)](https://mlflow.org/)
 [![CI/CD](https://img.shields.io/badge/CI%2FCD-GitHub_Actions-green.svg)](https://github.com/features/actions)
+[![FastAPI](https://img.shields.io/badge/Serving-FastAPI-009688.svg)](https://fastapi.tiangolo.com/)
+[![Docker](https://img.shields.io/badge/Docker-Ready-2496ED.svg)](https://www.docker.com/)
 
-**Recomendador de produtos com Deep Learning (NeuMF), avaliação por métricas de ranking, explicabilidade com SHAP e ambiente MLOps completo (uv + DVC/DagsHub + MLflow).**
+**Recomendador de produtos com Deep Learning (NeuMF), avaliação por métricas de ranking, explicabilidade com SHAP, ambiente MLOps completo (uv + DVC/DagsHub + MLflow) e serviço de inferência empacotado (FastAPI + Docker).**
 
 </div>
 
@@ -33,6 +35,7 @@
 - [Estrutura do Repositório](#estrutura-do-repositório)
 - [Instalação e Uso](#instalação-e-uso)
 - [Testes](#testes)
+- [Serviço de Inferência (API)](#serviço-de-inferência-api)
 - [Observações Importantes](#observações-importantes)
 - [Licença](#licença)
 - [Contato](#contato)
@@ -326,10 +329,12 @@ Sistema_Recomendacao_Arquitetura-MLOps/
 │       ├── modelo_ensemble.py     # Ensemble (estágio complementar)
 │       ├── benchmark_sintetico.py # Benchmark de escala (base sintética)
 │       └── benchmark_sc_base_03.py # Benchmark em base pública real (sc_base_03)
-├── tests/                     # pytest (utilidades do modelo e do sistema)
+├── serving/                   # Serviço de inferência (FastAPI): app, service, schemas
+├── tests/                     # pytest (utilidades do modelo, sistema e API)
 ├── report/                    # Figuras SHAP/benchmark e relatório PDF
 ├── docs/                      # Guias (OPTIMIZATION_GUIDE.md, SYNC_GUIDE.md)
 ├── .github/workflows/ci.yml   # CI/CD
+├── Dockerfile · .dockerignore # Empacotamento do serviço (multi-stage, non-root)
 ├── dvc.yaml · .dvc/           # Pipeline e remote DagsHub
 ├── pyproject.toml · uv.lock   # Ambiente reprodutível (uv)
 ├── .env.example               # Modelo de credenciais (copiar para .env)
@@ -379,7 +384,41 @@ uv run mlflow ui --backend-store-uri sqlite:///mlflow.db
 uv run python -m pytest tests/ -v
 ```
 
-A suíte cobre as utilidades do modelo (criação da NeuMF, prior de popularidade, combinação de scores, baselines) e o comportamento do sistema de recomendação.
+A suíte cobre as utilidades do modelo (criação da NeuMF, prior de popularidade, combinação de scores, baselines), o comportamento do sistema de recomendação e a **API de inferência** (`tests/test_api.py`, com recomendador sintético — não depende dos artefatos do DVC).
+
+## Serviço de Inferência (API)
+
+O modelo treinado é exposto como um serviço REST de **referência** (`serving/`), pronto para ser empacotado e entregue a um time de produção:
+
+- **`GET /health`** — estado do serviço e dos artefatos carregados;
+- **`POST /recommend`** — top-k personalizado, com **explicação SHAP por item** (atribuição do score neural às quatro entradas do NeuMF: cliente, produto, categoria, subcategoria). Clientes sem histórico (*cold start*) recebem o *fallback* por popularidade, com `cold_start = true` e explicação vazia.
+
+O serviço carrega os artefatos (`models/` e `dados/dados_tratados.parquet`, versionados no DVC) **uma única vez** no *startup*; se eles não estiverem disponíveis, `/recommend` responde **503** em vez de falhar.
+
+**Subir localmente** (sem Docker):
+
+```bash
+uv run uvicorn serving.app:app --host 0.0.0.0 --port 8000
+```
+
+**Build e execução via Docker** (rode `uv run dvc pull` antes, para que os artefatos existam no contexto de build):
+
+```bash
+docker build -t sistema-recomendacao:latest .
+docker run --rm -p 8000:8000 sistema-recomendacao:latest
+```
+
+**Exemplo de requisição:**
+
+```bash
+curl -X POST http://localhost:8000/recommend \
+  -H "Content-Type: application/json" \
+  -d '{"customer_name": "Claire Gute", "top_k": 7, "explain": true}'
+```
+
+A documentação interativa (OpenAPI/Swagger) fica em <http://localhost:8000/docs>.
+
+> **Nota de honestidade:** trata-se de um serviço de *referência* reprodutível — **"pronto para produção" ≠ "implantado em produção"**. Não há, por escopo, autenticação, cache distribuído nem orquestração (Kubernetes).
 
 ## Observações Importantes
 

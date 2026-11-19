@@ -1,0 +1,30 @@
+# Contexto de build enxuto para a imagem do serviço de inferência.
+
+# Controle de versão, ambientes e caches locais
+.git
+.github
+.dvc
+.dvcignore
+.venv
+.ruff_cache
+.pytest_cache
+.ipynb_checkpoints
+**/__pycache__
+*.py[cod]
+
+# Materiais não necessários em tempo de execução
+notebooks
+report
+docs
+img
+scripts
+tests
+mlruns
+.env
+.env.example
+
+# Apenas `dados/dados_tratados.parquet` é consumido pelo serviço.
+dados/sc_base_03
+dados/sc_base_01/sc_base_01_bruto.csv
+dados/benchmark_sintetico.parquet
+dados/benchmark_sc_base_03.parquet
