@@ -28,12 +28,13 @@ jobs:
       run: uv sync --frozen
 
     - name: Lint with ruff
-      run: uv run ruff check src/ || echo "Linting completed with warnings"
-      continue-on-error: true
+      run: uv run ruff check .
 
+    # Black é obrigatório apenas no código novo (serving/ + testes da API).
+    # O legado de src/ ainda não está 100% no padrão black e será formatado
+    # separadamente, para não misturar um diff grande com este escopo.
     - name: Check code formatting (black)
-      run: uv run black --check src/ || echo "Formatting check completed"
-      continue-on-error: true
+      run: uv run black --check serving/ tests/test_api.py
 
     - name: Run tests (pytest)
       run: uv run python -m pytest tests/ -v --tb=short
