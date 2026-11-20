@@ -7,11 +7,13 @@ requisições antes de qualquer chamada ao modelo.
 
 from __future__ import annotations
 
+from typing import Literal
+
 from pydantic import BaseModel, Field
 
 
 class RecommendationItem(BaseModel):
-    """Uma recomendação individual, com a explicação SHAP do score neural."""
+    """Uma recomendação individual, com a explicação SHAP do score de ranking."""
 
     ranking: int = Field(description="Posição na lista (1 = melhor).")
     product_id: str = Field(description="Identificador do produto.")
@@ -24,7 +26,8 @@ class RecommendationItem(BaseModel):
     shap: dict[str, float] = Field(
         default_factory=dict,
         description="Contribuição de cada entrada (cliente, produto, categoria, subcategoria) "
-        "para o score neural. Vazio em cold start ou quando ``explain=false``.",
+        "para o score híbrido efetivamente usado no ranking. Vazio em cold start "
+        "ou quando ``explain=false``.",
     )
 
 
@@ -53,6 +56,9 @@ class RecommendResponse(BaseModel):
     )
     alpha: float = Field(
         description="Peso do sinal personalizado do NeuMF no score híbrido."
+    )
+    ranking_mode: Literal["popularity", "hybrid"] = Field(
+        description="Estratégia ativa: popularidade pura ou combinação com NeuMF."
     )
     top_k: int
     base_value: float | None = Field(

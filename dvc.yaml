@@ -1,4 +1,4 @@
-# Pipeline DVC — Sistema de Recomendação (Sams Club)
+# Pipeline DVC — Sistema de Recomendação de Produtos
 # ---------------------------------------------------------------------------
 # Grafo: preparacao_dados gera o parquet tratado, consumido em PARALELO por
 # treinamento_modelo e treinamento_ensemble (estágios independentes entre si):
@@ -23,7 +23,7 @@ stages:
       - src/config/auxiliares_ml.py
       - dados/sc_base_01/sc_base_01_bruto.csv
     outs:
-      - dados/dados_tratados.parquet
+      - dados/sc_base_01/sc_base_01_tratado.parquet
 
   treinamento_modelo:
     desc: "Treina o recomendador híbrido popularity-first (NeuMF + prior) e salva modelo + encoders."
@@ -34,7 +34,7 @@ stages:
       - src/config/auxiliares_ml.py
       - src/config/model_utils.py
       - src/config/mlflow_tracking.py
-      - dados/dados_tratados.parquet
+      - dados/sc_base_01/sc_base_01_tratado.parquet
     outs:
       - models/best_model_recomendacao_otimizado.keras
       - models/hybrid_config_otimizado.pkl
@@ -50,7 +50,7 @@ stages:
       - src/scripts/modelo_ensemble.py
       - src/config/paths.py
       - src/config/auxiliares_ml.py
-      - dados/dados_tratados.parquet
+      - dados/sc_base_01/sc_base_01_tratado.parquet
     outs:
       - models/ensemble/
 
@@ -83,7 +83,7 @@ stages:
       - dados/sc_base_03/item_properties_part2.csv
       - dados/sc_base_03/category_tree.csv
     outs:
-      - dados/benchmark_sc_base_03.parquet
+      - dados/sc_base_03/benchmark_sc_base_03.parquet
     metrics:
       - report/benchmark_sc_base_03_metricas.json:
           cache: false

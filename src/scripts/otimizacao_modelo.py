@@ -204,7 +204,7 @@ def main() -> None:
         "ganho_ndcg_sobre_populares": float(ganho_pop),
     }
     params_log = {
-        "base": "sc_base_01_real",
+        "base": "sc_base_01",
         "embedding_dim": EMBEDDING_DIM,
         "l2_strength": L2_STRENGTH,
         "dropout": DROPOUT,

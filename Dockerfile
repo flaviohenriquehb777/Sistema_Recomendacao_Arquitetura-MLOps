@@ -8,7 +8,7 @@
 #
 # Atenção: os artefatos de modelo e os dados tratados são versionados via DVC
 # (não no git). Rode `dvc pull` antes do build para que `models/` e
-# `dados/dados_tratados.parquet` existam no contexto de build.
+# `dados/sc_base_01/sc_base_01_tratado.parquet` existam no contexto de build.
 #
 #   docker build -t sistema-recomendacao:latest .
 #   docker run --rm -p 8000:8000 sistema-recomendacao:latest
@@ -40,15 +40,15 @@ COPY serving/ ./serving/
 FROM python:3.11-slim AS runtime
 
 # libgomp1: exigida pelos wheels manylinux do scikit-learn (OpenMP).
-RUN apt-get update \
-    && apt-get install -y --no-install-recommends libgomp1 \
+RUN DEBIAN_FRONTEND=noninteractive apt-get update \
+    && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends libgomp1 \
     && rm -rf /var/lib/apt/lists/*
 
 ENV PYTHONUNBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1 \
     PATH="/opt/venv/bin:$PATH" \
     MODELS_DIR=/app/models \
-    DATA_PATH=/app/dados/dados_tratados.parquet
+    DATA_PATH=/app/dados/sc_base_01/sc_base_01_tratado.parquet
 
 WORKDIR /app
 

@@ -5,7 +5,7 @@ Benchmark de **escala** — roda o pipeline de recomendação REAL sobre uma bas
 
 Motivação
 ---------
-A base pública pequena (sc_base_01: ~800 clientes, ~12 itens/cliente, densidade
+A base pública pequena (`sc_base_01`: ~800 clientes, ~12 itens/cliente, densidade
 0,66 %) não contém sinal colaborativo suficiente para um modelo neural superar o
 *baseline* de popularidade. Para demonstrar o comportamento esperado de um
 recomendador em **escala de produção**, este script:

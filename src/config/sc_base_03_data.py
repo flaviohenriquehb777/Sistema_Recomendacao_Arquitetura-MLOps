@@ -1,19 +1,19 @@
 """
-Preparação da base pública **sc_base_03** (e-commerce real, feedback implícito).
+Preparação da base **sc_base_03** (e-commerce real, feedback implícito).
 
 Origem e honestidade
 --------------------
-A sc_base_03 é um *log de eventos* real de um site de e-commerce, publicado no
-portal de dados (``sc_base_03/ecommerce-dataset``), cobrindo ~4,5 meses. É **dado real**,
-não sintético — porém **anonimizado** (não há nomes de produto nem de cliente).
+A ``sc_base_03`` é um *log de eventos* real de um site de e-commerce, cobrindo
+~4,5 meses, distribuído para uso em pesquisa e **anonimizado** (não há nomes de
+produto nem de cliente). É **dado real**, não sintético.
 
 Eventos (``events.csv``): ``timestamp, visitorid, event, itemid, transactionid``,
 com ``event`` ∈ {``view``, ``addtocart``, ``transaction``}. Tratamos o conjunto
 de eventos como **feedback implícito binário** (interagiu / não interagiu).
 
 Por que esta base?
-    A base própria (sc_base_01) é pequena e esparsa demais para um modelo
-    neural superar a popularidade. A sc_base_03 traz **sinal implícito real**
+    A base própria (``sc_base_01``) é pequena e esparsa demais para um modelo
+    neural superar a popularidade. A ``sc_base_03`` traz **sinal implícito real**
     (e dezenas de milhares de interações úteis) — o cenário em que um
     recomendador de fato demonstra valor.
 
@@ -42,10 +42,11 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
-from src.config.paths import DATA_DIR
+from src.config.paths import SC_BASE_03_DIR
 
-# Diretório com os arquivos brutos baixados do portal de dados (ver README).
-sc_base_03_RAW_DIR = DATA_DIR / "sc_base_03"
+# Diretório com os arquivos brutos de `sc_base_03` (obtidos na etapa 2 do
+# roadmap). Os brutos não são versionados nem entram na imagem Docker.
+SC_BASE_03_RAW_DIR = SC_BASE_03_DIR
 
 # Esquema padrão consumido pelo pipeline de recomendação.
 COLUNAS_PADRAO = [
@@ -62,22 +63,22 @@ PROPRIEDADE_CATEGORIA = "categoryid"
 CHUNK_PROPRIEDADES = 2_000_000
 
 
-def carregar_eventos(dir_bruto: Path = sc_base_03_RAW_DIR) -> pd.DataFrame:
+def carregar_eventos(dir_bruto: Path = SC_BASE_03_RAW_DIR) -> pd.DataFrame:
     """Carrega ``events.csv`` e converte o timestamp (ms epoch) em datetime."""
     caminho = Path(dir_bruto) / "events.csv"
     if not caminho.exists():
         raise FileNotFoundError(
             f"Arquivo não encontrado: {caminho}.\n"
-            "Baixe a base sc_base_03 do portal de dados e extraia em 'dados/sc_base_03':\n"
-            "    portal de dados datasets download -d sc_base_03/ecommerce-dataset "
-            "-p dados/sc_base_03 --unzip"
+            "Os arquivos brutos de `sc_base_03` devem ser obtidos na etapa 2 do "
+            "roadmap e extraídos em 'dados/sc_base_03'\n"
+            "(ver docs/ROADMAP_RECOMENDACAO_ESCALA.md)."
         )
     eventos = pd.read_csv(caminho)
     eventos["timestamp"] = pd.to_datetime(eventos["timestamp"], unit="ms")
     return eventos[["timestamp", "visitorid", "event", "itemid"]]
 
 
-def carregar_categorias(dir_bruto: Path = sc_base_03_RAW_DIR) -> pd.Series:
+def carregar_categorias(dir_bruto: Path = SC_BASE_03_RAW_DIR) -> pd.Series:
     """
     Mapeia ``itemid`` -> ``categoryid`` (valor mais recente por item).
 
@@ -103,7 +104,7 @@ def carregar_categorias(dir_bruto: Path = sc_base_03_RAW_DIR) -> pd.Series:
     return categorias.set_index("itemid")["value"].astype(str).rename(PROPRIEDADE_CATEGORIA)
 
 
-def carregar_arvore_categorias(dir_bruto: Path = sc_base_03_RAW_DIR) -> pd.Series:
+def carregar_arvore_categorias(dir_bruto: Path = SC_BASE_03_RAW_DIR) -> pd.Series:
     """Mapeia ``categoryid`` -> ``parentid`` a partir de ``category_tree.csv``."""
     caminho = Path(dir_bruto) / "category_tree.csv"
     if not caminho.exists():
@@ -113,7 +114,7 @@ def carregar_arvore_categorias(dir_bruto: Path = sc_base_03_RAW_DIR) -> pd.Serie
 
 
 def construir_interacoes(
-    dir_bruto: Path = sc_base_03_RAW_DIR,
+    dir_bruto: Path = SC_BASE_03_RAW_DIR,
     min_eventos_item: int = 100,
     min_itens_usuario: int = 5,
     max_clientes: int | None = 5000,

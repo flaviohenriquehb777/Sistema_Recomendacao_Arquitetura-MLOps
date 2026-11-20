@@ -2,8 +2,8 @@
 """
 Estágio de preparação de dados do pipeline DVC.
 
-Lê a base bruta ("Sams Club") em CSV, aplica o tratamento mínimo necessário
-(correção de valores nulos e downcast dos tipos numéricos) e grava a base
+Lê a base bruta (`sc_base_01`) em CSV, aplica o tratamento mínimo necessário
+(normalização de espaços Unicode, correção de valores nulos e downcast dos tipos numéricos) e grava a base
 tratada em Parquet, que é consumida pelos estágios de treinamento.
 
 Reproduz fielmente o tratamento definido em
@@ -31,10 +31,15 @@ def carregar_dados_brutos() -> pd.DataFrame:
 def tratar_dados(df: pd.DataFrame) -> pd.DataFrame:
     """
     Aplica o tratamento mínimo da base:
-      1. Preenche os valores nulos de 'Postal Code' com o CEP padrão.
-      2. Faz o downcast dos tipos numéricos para reduzir o uso de memória.
+      1. Substitui espaços não separáveis por espaços comuns nas colunas textuais.
+      2. Preenche os valores nulos de 'Postal Code' com o CEP padrão.
+      3. Faz o downcast dos tipos numéricos para reduzir o uso de memória.
     """
     df = df.copy()
+
+    colunas_textuais = df.select_dtypes(include=["object", "string"]).columns
+    for coluna in colunas_textuais:
+        df[coluna] = df[coluna].str.replace("\u00a0", " ", regex=False)
 
     if "Postal Code" in df.columns:
         df.loc[df["Postal Code"].isnull(), "Postal Code"] = POSTAL_CODE_PADRAO
@@ -55,9 +60,15 @@ def main() -> None:
 
     print(f"Lendo base bruta: {DADOS_BRUTOS}")
     df_bruto = carregar_dados_brutos()
-    print(f"Base bruta carregada: {df_bruto.shape[0]} linhas x {df_bruto.shape[1]} colunas")
+    print(
+        f"Base bruta carregada: {df_bruto.shape[0]} linhas x {df_bruto.shape[1]} colunas"
+    )
 
-    nulos_postal = int(df_bruto["Postal Code"].isnull().sum()) if "Postal Code" in df_bruto.columns else 0
+    nulos_postal = (
+        int(df_bruto["Postal Code"].isnull().sum())
+        if "Postal Code" in df_bruto.columns
+        else 0
+    )
     print(f"Valores nulos em 'Postal Code': {nulos_postal}")
 
     df_tratado = tratar_dados(df_bruto)

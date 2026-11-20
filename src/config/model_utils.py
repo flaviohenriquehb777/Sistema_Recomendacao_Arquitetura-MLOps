@@ -1,5 +1,5 @@
 """
-Utilitários de modelagem do sistema de recomendação (base "Sam's Club").
+Utilitários de modelagem do sistema de recomendação.
 
 Abordagem
 ---------

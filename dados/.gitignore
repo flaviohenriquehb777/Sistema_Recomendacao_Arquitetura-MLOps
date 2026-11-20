@@ -1,5 +1,5 @@
-/dados_tratados.parquet
+/sc_base_01/sc_base_01_tratado.parquet
 /benchmark_sintetico.parquet
-/benchmark_sc_base_03.parquet
-# CSVs brutos da base pública sc_base_03 (~1 GB) — baixados do portal de dados, não versionados.
-/sc_base_03/
+/sc_base_03/benchmark_sc_base_03.parquet
+# CSVs brutos da base sc_base_03 (~1 GB) — não versionados.
+/sc_base_03/*.csv

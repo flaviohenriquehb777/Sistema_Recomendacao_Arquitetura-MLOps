@@ -7,7 +7,7 @@ Esta base é **100 % sintética** e é gerada por um processo **explicitamente
 documentado e reproduzível** (semente fixa). Ela **não** representa dados reais
 de nenhuma empresa. Seu objetivo é servir de *benchmark* para exercitar o
 pipeline de recomendação em uma **escala e com uma estrutura colaborativa** que a
-base pública pequena (sc_base_01) não possui.
+base pública pequena (`sc_base_01`) não possui.
 
 Por que uma base sintética é legítima para portfólio:
     * dados reais de clientes são protegidos por privacidade — o que se publica

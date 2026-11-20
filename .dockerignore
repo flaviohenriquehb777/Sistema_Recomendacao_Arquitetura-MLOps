@@ -23,8 +23,7 @@ mlruns
 .env
 .env.example
 
-# Apenas `dados/dados_tratados.parquet` é consumido pelo serviço.
+# Apenas `dados/sc_base_01/sc_base_01_tratado.parquet` é consumido pelo serviço.
 dados/sc_base_03
 dados/sc_base_01/sc_base_01_bruto.csv
 dados/benchmark_sintetico.parquet
-dados/benchmark_sc_base_03.parquet

@@ -4,7 +4,7 @@ Aplicação FastAPI do serviço de inferência.
 Expõe dois endpoints:
 
 * ``GET  /health``    — estado do serviço e dos artefatos carregados;
-* ``POST /recommend`` — top-k personalizado com explicação SHAP por item.
+* ``POST /recommend`` — top-k com modo de ranking explícito e explicação SHAP.
 
 Execução local::
 

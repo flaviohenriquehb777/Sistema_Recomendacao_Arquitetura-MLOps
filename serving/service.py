@@ -4,12 +4,12 @@ Serviço de inferência do sistema de recomendação.
 Carrega, uma única vez, os artefatos produzidos pelo estágio DVC
 ``treinamento_modelo`` e oferece as operações reutilizadas pela API:
 
-* ``recommend`` — top-k personalizado (híbrido popularity-first), excluindo os
-  itens já vistos pelo cliente e caindo no *baseline* Most-Popular para clientes
-  desconhecidos (cold start);
-* explicação **SHAP** por item, atribuindo o score neural às quatro entradas do
-  NeuMF (cliente, produto, categoria, subcategoria) — a mesma abordagem de
-  ``notebooks/05_SHAP_Avancado.ipynb`` (``shap.KernelExplainer``).
+* ``recommend`` — top-k excluindo os itens já vistos, usando o modo escolhido
+  pela validação (híbrido ou popularidade) e recorrendo a Most-Popular para
+  clientes desconhecidos (cold start);
+* explicação **SHAP** por item, atribuindo o score híbrido efetivamente usado
+  no ranking às quatro entradas do NeuMF (cliente, produto, categoria,
+  subcategoria).
 
 Este módulo NÃO importa ``src.config.paths`` (que exige o CSV bruto). Os
 caminhos dos artefatos vêm de ``MODELS_DIR`` / ``DATA_PATH`` (variáveis de
@@ -78,9 +78,13 @@ class RecommenderService:
         self.product_ids, self.category_ids, self.subcategory_ids = catalog
         self.num_products = len(self.product_ids)
         self.num_customers = len(encoders["customer"].classes_)
+        popularidade_log = np.log1p(np.asarray(popularity, dtype="float64"))
+        desvio_popularidade = float(popularidade_log.std())
+        self.popularity_z = (popularidade_log - popularidade_log.mean()) / (
+            desvio_popularidade if desvio_popularidade else 1.0
+        )
 
         self._background = self._build_background(background_size)
-        self._explainer: shap.KernelExplainer | None = None
 
     # ------------------------------------------------------------------ #
     # Construção
@@ -92,7 +96,10 @@ class RecommenderService:
         """Carrega os artefatos do disco (modelo, encoders, config do híbrido e dados)."""
         models_dir = Path(models_dir or os.environ.get("MODELS_DIR", "models"))
         data_path = Path(
-            data_path or os.environ.get("DATA_PATH", "dados/dados_tratados.parquet")
+            data_path
+            or os.environ.get(
+                "DATA_PATH", "dados/sc_base_01/sc_base_01_tratado.parquet"
+            )
         )
 
         model = tf.keras.models.load_model(models_dir / MODEL_FILENAME)
@@ -173,6 +180,9 @@ class RecommenderService:
             "customer_name": customer_name,
             "cold_start": cold_start,
             "alpha": self.alpha,
+            "ranking_mode": (
+                "popularity" if cold_start or self.alpha == 0.0 else "hybrid"
+            ),
             "top_k": top_k,
             "base_value": base_value,
             "recommendations": recomendacoes,
@@ -185,30 +195,35 @@ class RecommenderService:
         except ValueError:
             return None
 
-    @property
-    def explainer(self) -> shap.KernelExplainer:
-        """``KernelExplainer`` construído de forma preguiçosa sobre o score neural."""
-        if self._explainer is None:
-            self._explainer = shap.KernelExplainer(self._score, self._background)
-        return self._explainer
-
-    def _score(self, X: np.ndarray) -> np.ndarray:
-        """Função de score neural (probabilidade) das quatro entradas do NeuMF."""
+    def _predict_neural(self, X: np.ndarray) -> np.ndarray:
+        """Prediz o score neural para as quatro entradas do NeuMF."""
         X = np.asarray(X)
-        return self.model.predict(
+        previsoes = self.model(
             [
                 X[:, 0].reshape(-1, 1),
                 X[:, 1].reshape(-1, 1),
                 X[:, 2].reshape(-1, 1),
                 X[:, 3].reshape(-1, 1),
             ],
-            verbose=0,
-        ).ravel()
+            training=False,
+        )
+        return np.asarray(previsoes).ravel()
+
+    def _hybrid_score(
+        self, X: np.ndarray, model_mean: float, model_std: float
+    ) -> np.ndarray:
+        """Reproduz o score de ranking para uma distribuição fixa do cliente."""
+        X = np.asarray(X, dtype="int64")
+        desvio_modelo = model_std if model_std else 1.0
+        score_neural = self._predict_neural(X)
+        return self.popularity_z[X[:, 1]] + self.alpha * (
+            (score_neural - model_mean) / desvio_modelo
+        )
 
     def _explain(
         self, customer_id: int, tabela: pd.DataFrame
     ) -> tuple[list[dict[str, float]], float]:
-        """Atribui o score neural de cada item recomendado às quatro entradas (SHAP)."""
+        """Atribui o score híbrido de cada item recomendado via SHAP."""
         entradas = np.column_stack(
             [
                 np.full(len(tabela), customer_id, dtype="int64"),
@@ -218,8 +233,25 @@ class RecommenderService:
             ]
         ).astype("int64")
 
+        entradas_catalogo = np.column_stack(
+            [
+                np.full(self.num_products, customer_id, dtype="int64"),
+                self.product_ids,
+                self.category_ids,
+                self.subcategory_ids,
+            ]
+        )
+        scores_catalogo = self._predict_neural(entradas_catalogo)
+        media_modelo = float(scores_catalogo.mean())
+        desvio_modelo = float(scores_catalogo.std())
+
+        def funcao_score(X: np.ndarray) -> np.ndarray:
+            return self._hybrid_score(X, media_modelo, desvio_modelo)
+
+        explainer = shap.KernelExplainer(funcao_score, self._background)
+
         valores = np.asarray(
-            self.explainer.shap_values(entradas, nsamples=self.shap_nsamples)
+            explainer.shap_values(entradas, nsamples=self.shap_nsamples)
         )
         if valores.ndim == 3:  # (n, features, saída) em algumas versões do SHAP
             valores = valores[..., 0]
@@ -231,5 +263,5 @@ class RecommenderService:
             }
             for i in range(len(tabela))
         ]
-        base_value = round(float(np.ravel(self.explainer.expected_value)[0]), 6)
+        base_value = round(float(np.ravel(explainer.expected_value)[0]), 6)
         return atribuicoes, base_value

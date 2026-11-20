@@ -1,7 +1,7 @@
 <div align="center">
 
 # Sistema de Recomendações
-## Sam's Club — Walmart
+## Base de Estudo `sc_base_01`
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE.md)
 [![Python 3.11](https://img.shields.io/badge/Python-3.11-blue.svg)](https://www.python.org/)
@@ -24,7 +24,7 @@
 - [Descrição do Modelo](#descrição-do-modelo)
 - [Motivação](#motivação)
 - [Tecnologias Utilizadas](#tecnologias-utilizadas)
-- [Base de Dados](#base-de-dados)
+- [Bases de Dados](#bases-de-dados)
 - [Arquitetura do Modelo](#arquitetura-do-modelo)
 - [Processo de Desenvolvimento](#processo-de-desenvolvimento)
 - [Resultados (base real sc_base_01)](#resultados-base-real-sc_base_01)
@@ -44,7 +44,7 @@
 
 ## Descrição do Modelo
 
-Este modelo implementa um **sistema de recomendação de produtos** para consumidores do Sam's Club — Walmart, construído sobre a base de vendas *sc_base_01*. O problema é tratado como **filtragem colaborativa neural com objetivo de ranking**: dado um cliente, ordenar o catálogo e devolver os **07 (sete) produtos mais relevantes**, excluindo os itens que o cliente já comprou.
+Este modelo implementa um **sistema de recomendação de produtos**, construído sobre a base de vendas *sc_base_01*. O problema é tratado como **filtragem colaborativa neural com objetivo de ranking**: dado um cliente, ordenar o catálogo e devolver os **07 (sete) produtos mais relevantes**, excluindo os itens que o cliente já comprou.
 
 A rede é uma **NeuMF** (Neural Matrix Factorization, He et al., 2017) — combinação de *GMF* (fatoração generalizada) e *MLP* — treinada com **entropia cruzada binária sobre pares cliente–produto** com **amostragem de negativos**, em vez de regressão sobre a coluna `Sales`. Essa é a decisão de modelagem central e está justificada em [Arquitetura do Modelo](#arquitetura-do-modelo).
 
@@ -56,11 +56,11 @@ score(cliente, produto) = z(log1p(popularidade)) + alpha · z(NeuMF(cliente, pro
 
 onde o *prior* de popularidade (contado no treino) é o sinal-base e o sinal personalizado da NeuMF entra como um ajuste ponderado por `alpha`, escolhido na validação.
 
-No exemplo demonstrado, as recomendações são geradas para a cliente **Irene Maddox**. O sistema inclui uma função flexível que gera recomendações para **qualquer** consumidor — incluindo **novos clientes** (cold start), que não estavam na base de treino.
+No exemplo demonstrado, as recomendações são geradas para uma **cliente de exemplo** da base. O sistema inclui uma função flexível que gera recomendações para **qualquer** consumidor — incluindo **novos clientes** (cold start), que não estavam na base de treino.
 
 ## Motivação
 
-Aprimorar a experiência de compra dos clientes do Sam's Club — Walmart por meio de recomendações altamente personalizadas. Ao direcionar cada usuário a produtos que realmente lhe interessam, o sistema busca aumentar a conversão, a satisfação e a lealdade, apoiando as estratégias de *cross-sell* e *upsell* da plataforma.
+Aprimorar a experiência de compra dos clientes por meio de recomendações altamente personalizadas. Ao direcionar cada usuário a produtos que realmente lhe interessam, o sistema busca aumentar a conversão, a satisfação e a lealdade, apoiando as estratégias de *cross-sell* e *upsell* da plataforma.
 
 ## Tecnologias Utilizadas
 
@@ -78,9 +78,17 @@ Aprimorar a experiência de compra dos clientes do Sam's Club — Walmart por me
 
 </div>
 
-## Base de Dados
+## Bases de Dados
 
-A base é a *sc_base_01* (transações de varejo). Na etapa de preparação (`src/scripts/preparar_dados.py`) são aplicados: remoção de valores nulos, correção de tipos (`dtypes`) e *downcast* para reduzir o uso de memória. O resultado é persistido em **Parquet** (`dados/dados_tratados.parquet`) para leitura eficiente.
+O projeto trabalha com bases identificadas **apenas por nome-código** — `sc_base_01`, `sc_base_02` e `sc_base_03` — para manter a imersão no projeto e isolar a análise de qualquer referência externa. Cada base passa pelas mesmas etapas de **entendimento e tratamento de dados** antes de alimentar o modelo (ver `docs/ROADMAP_RECOMENDACAO_ESCALA.md`).
+
+| Código | Papel no projeto |
+|:--|:--|
+| `sc_base_01` | **Baseline** de transações de varejo — valida o sistema de produção (ETL, DVC, MLflow, SHAP, cold start). |
+| `sc_base_02` | **Base principal de escala** — destinada a sustentar personalização com volume real de interações. |
+| `sc_base_03` | **Base comportamental** (log de eventos) — sinal implícito real, complementar à `sc_base_01`. |
+
+Na etapa de preparação da `sc_base_01` (`src/scripts/preparar_dados.py`) são aplicados: remoção de valores nulos, correção de tipos (`dtypes`) e *downcast* para reduzir o uso de memória. O resultado é persistido em **Parquet** (`dados/sc_base_01/sc_base_01_tratado.parquet`) para leitura eficiente.
 
 <div align="center">
 
@@ -235,7 +243,7 @@ Métricas de **teste** (*leave-last-out*, catálogo completo, `k = 7`):
 
 ## Benchmark em Base Pública Real (sc_base_03)
 
-> **Aviso de honestidade.** A base desta seção é **real** — o *log de eventos* público da **sc_base_03** (portal de dados, `sc_base_03/ecommerce-dataset`), com *feedback* implícito de verdade (`view`, `addtocart`, `transaction`). Ela é **anonimizada** (sem nomes de produto/cliente) e recebe **filtros explícitos de tratabilidade** (itens/usuários relevantes + amostra determinística, `src/config/sc_base_03_data.py`). Por ser dado real, **não existe "teto oracle"** (não há fator latente verdadeiro conhecido).
+> **Aviso de honestidade.** A base desta seção é **real** — o *log de eventos* público da **sc_base_03**, com *feedback* implícito de verdade (`view`, `addtocart`, `transaction`). Ela é **anonimizada** (sem nomes de produto/cliente) e recebe **filtros explícitos de tratabilidade** (itens/usuários relevantes + amostra determinística, `src/config/sc_base_03_data.py`). Por ser dado real, **não existe "teto oracle"** (não há fator latente verdadeiro conhecido).
 
 A base sintética prova que o método funciona quando **construímos** o sinal — o que é, em alguma medida, circular. A sc_base_03 fecha essa lacuna: é um e-commerce **real**, com sinal implícito que o sistema não controla. Aqui o mesmo pipeline é executado sobre dado real de outra origem, sem qualquer ajuste de código.
 
@@ -267,7 +275,7 @@ Métricas de **teste** (*leave-last-out*, catálogo completo, `k = 7`):
 
 **Leitura sênior.** Em dado real e anonimizado, o modelo **supera o *baseline* de popularidade em +363,5 % de NDCG@7** (0,0541 vs. 0,0117) — quase **1 em cada 10** clientes recebe o item relevante no top-7 (Hit-Rate@7 = 9,6 %, contra 2,2 % dos mais-populares e 0,19 % do aleatório). Diferente da base sc_base_01 (onde o híbrido colapsa em popularidade, `α = 0`), aqui a validação escolhe o **híbrido com personalização plena** (`α = 1,0`) — a rede de fato aprende preferências individuais. O ganho do NeuMF puro (0,0457) sobre a popularidade (0,0117) é a evidência de que **há sinal colaborativo real** capturado pelo modelo; o híbrido o reforça somando o *prior* de popularidade.
 
-**Reprodutibilidade:** script `python -m src.scripts.benchmark_sc_base_03` (estágio DVC `benchmark_publico_sc_base_03`) · métricas em [`report/benchmark_sc_base_03_metricas.json`](report/benchmark_sc_base_03_metricas.json). Os CSVs brutos (~1 GB) são baixados do portal de dados (`portal de dados datasets download -d sc_base_03/ecommerce-dataset -p dados/sc_base_03 --unzip`) e não são versionados.
+**Reprodutibilidade:** script `python -m src.scripts.benchmark_sc_base_03` (estágio DVC `benchmark_publico_sc_base_03`) · métricas em [`report/benchmark_sc_base_03_metricas.json`](report/benchmark_sc_base_03_metricas.json). Os CSVs brutos da base (`dados/sc_base_03/`, ~1 GB) são obtidos na etapa 2 do roadmap (ver `docs/ROADMAP_RECOMENDACAO_ESCALA.md`) e **não são versionados**.
 
 ## Explicabilidade (SHAP)
 
@@ -292,13 +300,15 @@ As três colunas convergem: **categoria e subcategoria** concentram a informaç�
 O `pyproject.toml` é a **fonte única** do ambiente; o `uv.lock` fixa todas as versões resolvidas (reprodutibilidade total) e o `requirements.txt` é **exportado** do lock para compatibilidade com ferramentas legadas.
 
 ### DVC + DagsHub — versionamento de dados e modelos
-O *remote* do DVC é o **DagsHub deste projeto** (`https://dagshub.com/flaviohenriquehb777/Sistema_Recomendacao_Arquitetura-MLOps.dvc`). O pipeline é declarado em `dvc.yaml` com três estágios:
+O *remote* do DVC é o **DagsHub deste projeto** (`https://dagshub.com/flaviohenriquehb777/Sistema_Recomendacao_Arquitetura-MLOps.dvc`). O pipeline é declarado em `dvc.yaml` com cinco estágios:
 
 | Estágio | Comando | Saídas versionadas |
 |:--|:--|:--|
-| `preparacao_dados` | `python -m src.scripts.preparar_dados` | `dados/dados_tratados.parquet` |
+| `preparacao_dados` | `python -m src.scripts.preparar_dados` | `dados/sc_base_01/sc_base_01_tratado.parquet` |
 | `treinamento_modelo` | `python -m src.scripts.otimizacao_modelo` | `models/best_model_recomendacao_otimizado.keras`, `models/hybrid_config_otimizado.pkl`, `models/*_encoder_otimizado.pkl` |
 | `treinamento_ensemble` | `python -m src.scripts.modelo_ensemble` | `models/ensemble/` |
+| `benchmark_sintetico` | `python -m src.scripts.benchmark_sintetico` | `dados/benchmark_sintetico.parquet` |
+| `benchmark_publico_sc_base_03` | `python -m src.scripts.benchmark_sc_base_03` | `dados/sc_base_03/benchmark_sc_base_03.parquet` |
 
 ### MLflow — tracking e model registry
 - Backend **local em SQLite** (`sqlite:///<raiz>/mlflow.db`) por padrão — 100 % offline e recomendado pelo MLflow 3 (o antigo *file store* `mlruns/` está em *maintenance mode*).
@@ -312,7 +322,7 @@ Pipeline em `.github/workflows/ci.yml` com `uv sync --frozen`, **Ruff** (lint), 
 
 ```
 Sistema_Recomendacao_Arquitetura-MLOps/
-├── dados/                     # Base bruta (CSV) e tratada (Parquet) — DVC
+├── dados/                     # Uma pasta por base (sc_base_01, sc_base_03) — DVC
 ├── models/                    # Modelo, encoders e config do híbrido — DVC
 ├── notebooks/                 # 01..08 — narrativa executável do projeto
 ├── src/
@@ -391,9 +401,9 @@ A suíte cobre as utilidades do modelo (criação da NeuMF, prior de popularidad
 O modelo treinado é exposto como um serviço REST de **referência** (`serving/`), pronto para ser empacotado e entregue a um time de produção:
 
 - **`GET /health`** — estado do serviço e dos artefatos carregados;
-- **`POST /recommend`** — top-k personalizado, com **explicação SHAP por item** (atribuição do score neural às quatro entradas do NeuMF: cliente, produto, categoria, subcategoria). Clientes sem histórico (*cold start*) recebem o *fallback* por popularidade, com `cold_start = true` e explicação vazia.
+- **`POST /recommend`** — top-k com `ranking_mode` explícito (`popularity` ou `hybrid`) e **SHAP aditivo sobre o score efetivamente usado no ranking** (cliente, produto, categoria, subcategoria). Clientes sem histórico (*cold start*) recebem o *fallback* por popularidade, com `cold_start = true` e explicação vazia. O `alpha` é selecionado por validação; nesta base sc_base_01, o modo atual é `popularity`.
 
-O serviço carrega os artefatos (`models/` e `dados/dados_tratados.parquet`, versionados no DVC) **uma única vez** no *startup*; se eles não estiverem disponíveis, `/recommend` responde **503** em vez de falhar.
+O serviço carrega os artefatos (`models/` e `dados/sc_base_01/sc_base_01_tratado.parquet`, versionados no DVC) **uma única vez** no *startup*; se eles não estiverem disponíveis, `/recommend` responde **503** em vez de falhar.
 
 **Subir localmente** (sem Docker):
 
@@ -426,7 +436,7 @@ A documentação interativa (OpenAPI/Swagger) fica em <http://localhost:8000/doc
 - **Reprodutibilidade:** todas as funções usam sementes fixas (`RANDOM_SEED = 42`), o ambiente é congelado pelo `uv.lock` e os artefatos são versionados pelo DVC.
 - **Credenciais isoladas:** o rastreamento usa variáveis **próprias do projeto** para não herdar configuração de outros repositórios.
 - **Limitação honesta:** o desempenho é limitado pelo tamanho e pela esparsidade da base; o pipeline de ranking, a metodologia de avaliação e a explicabilidade estão prontos para escalar com mais dados.
-- **Três bases, três papéis:** a base **real** (sc_base_01) valida o **sistema de produção** (ETL, DVC, MLflow, SHAP, cold start) e expõe sua limitação honesta; o **benchmark sintético rotulado** valida o **método em escala** (+431,7 % de NDCG@7 sobre a popularidade); e o **benchmark em base pública real (sc_base_03)** prova que o **mesmo pipeline generaliza para dado real de outra origem** (+363,5 % de NDCG@7 sobre a popularidade, com personalização plena `α = 1,0`).
+- **Três bases, três papéis:** a base **real** (`sc_base_01`) valida o **sistema de produção** (ETL, DVC, MLflow, SHAP, cold start) e expõe sua limitação honesta; o **benchmark sintético rotulado** valida o **método em escala** (+431,7 % de NDCG@7 sobre a popularidade); e o **benchmark em base pública real (`sc_base_03`)** prova que o **mesmo pipeline generaliza para dado real de outra origem** (+363,5 % de NDCG@7 sobre a popularidade, com personalização plena `α = 1,0`).
 
 ## Licença
 

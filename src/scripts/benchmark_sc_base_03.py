@@ -1,14 +1,13 @@
 #!/usr/bin/env python3
 """
-Benchmark sobre a base pública REAL **sc_base_03** (e-commerce, feedback
-implícito anonimizado) — roda o pipeline de recomendação REAL e reporta métricas
-reais.
+Benchmark sobre a base **sc_base_03** (e-commerce real, feedback implícito
+anonimizado) — roda o pipeline de recomendação REAL e reporta métricas reais.
 
 Motivação
 ---------
-A base própria (sc_base_01) é pequena e esparsa demais para um modelo neural
+A base própria (`sc_base_01`) é pequena e esparsa demais para um modelo neural
 superar a popularidade. A base sintética demonstra a arquitetura, mas é, por
-construção, circular. A sc_base_03 fecha essa lacuna: é um **log de eventos
+construção, circular. A `sc_base_03` fecha essa lacuna: é um **log de eventos
 real** de um site de e-commerce, com sinal implícito de verdade (``view``,
 ``addtocart``, ``transaction``) — o cenário em que um recomendador prova valor.
 
@@ -28,8 +27,8 @@ determinística) — ambos documentados em ``sc_base_03_data``. Como os dados s�
 reais, **não existe "teto oracle"**: não há fator latente verdadeiro conhecido.
 
 Saídas:
-    dados/benchmark_sc_base_03.parquet          (base preparada, reproduzível)
-    report/benchmark_sc_base_03_metricas.json   (métricas + metadados)
+    dados/sc_base_03/benchmark_sc_base_03.parquet   (base preparada, reproduzível)
+    report/benchmark_sc_base_03_metricas.json       (métricas + metadados)
 
 Uso:
     python -m src.scripts.benchmark_sc_base_03
@@ -58,17 +57,17 @@ from src.config.model_utils import (
     train_ranking_model,
     train_validation_test_split,
 )
-from src.config.paths import DATA_DIR, REPORTS_DIR
+from src.config.paths import REPORTS_DIR, SC_BASE_03_DIR
 from src.config.sc_base_03_data import construir_interacoes, resumo_base
 
-# --- Filtros de tratabilidade da base bruta (ver sc_base_03_data) ----------
+# --- Filtros de tratabilidade da base bruta (ver sc_base_03_data) ------------
 MIN_EVENTOS_ITEM = 100
 MIN_ITENS_USUARIO = 5
 MAX_CLIENTES = 5000
 
 # --- Hiperparâmetros do modelo (arquitetura idêntica à de produção) ----------
 # Os dados reais têm sinal colaborativo; como no benchmark de escala, NÃO se
-# aplica a regularização forte calibrada para a base minúscula do sc_base_01.
+# aplica a regularização forte calibrada para a base minúscula do `sc_base_01`.
 EMBEDDING_DIM = 32
 L2_STRENGTH = 0.0
 DROPOUT = 0.0
@@ -94,7 +93,7 @@ def imprimir_metricas(titulo: str, metricas: dict) -> None:
 
 def main() -> None:
     print("=" * 70)
-    print("BENCHMARK SOBRE BASE PÚBLICA REAL — sc_base_03 (NeuMF + híbrido)")
+    print("BENCHMARK SOBRE A BASE sc_base_03 (NeuMF + híbrido)")
     print("=" * 70)
 
     # Tracking MLflow (não-bloqueante). Experimento PRÓPRIO do benchmark público,
@@ -102,7 +101,7 @@ def main() -> None:
     # modelo de produção.
     setup_mlflow(experiment_name="recomendacao_benchmark_publico")
 
-    # --- Base sc_base_03 (preparada a partir do bruto do portal de dados) -----------
+    # --- Base sc_base_03 (preparada a partir dos brutos locais) --------------
     print("\nPreparando a base a partir dos CSVs brutos da sc_base_03...")
     df = construir_interacoes(
         min_eventos_item=MIN_EVENTOS_ITEM,
@@ -110,8 +109,8 @@ def main() -> None:
         max_clientes=MAX_CLIENTES,
         seed=RANDOM_SEED,
     )
-    DATA_DIR.mkdir(parents=True, exist_ok=True)
-    caminho_base = DATA_DIR / "benchmark_sc_base_03.parquet"
+    SC_BASE_03_DIR.mkdir(parents=True, exist_ok=True)
+    caminho_base = SC_BASE_03_DIR / "benchmark_sc_base_03.parquet"
     df = df[COLUNAS]
     df.to_parquet(caminho_base, index=False)
     print(f"Base preparada e salva em: {caminho_base}")

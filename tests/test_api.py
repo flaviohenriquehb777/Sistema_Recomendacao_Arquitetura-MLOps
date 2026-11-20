@@ -4,7 +4,7 @@ Testes da API de inferência (``serving/app.py``) usando o ``TestClient`` do Fas
 Usa um recomendador SINTÉTICO pequeno, construído em memória, para não depender
 dos artefatos versionados no DVC nem da base real — assim os testes são rápidos
 e reprodutíveis em qualquer ambiente, inclusive no CI (onde `models/` e
-`dados_tratados.parquet` não estão no git).
+`sc_base_01_tratado.parquet` não estão no git).
 """
 
 from __future__ import annotations
@@ -96,6 +96,7 @@ def test_recommend_cliente_valido_com_shap(client: TestClient) -> None:
     corpo = resposta.json()
 
     assert corpo["cold_start"] is False
+    assert corpo["ranking_mode"] == "hybrid"
     assert corpo["top_k"] == 4
     assert len(corpo["recommendations"]) == 4  # 6 produtos - 2 vistos = 4 candidatos
     assert corpo["base_value"] is not None
@@ -108,6 +109,40 @@ def test_recommend_cliente_valido_com_shap(client: TestClient) -> None:
     for item in corpo["recommendations"]:
         assert set(item["shap"]) == SHAP_FEATURES
         assert all(isinstance(valor, float) for valor in item["shap"].values())
+        assert corpo["base_value"] + sum(item["shap"].values()) == pytest.approx(
+            item["score"], abs=1e-3
+        )
+
+
+def test_shap_explains_score_quando_alpha_zero(service: RecommenderService) -> None:
+    """Mesmo sem personalização, SHAP explica o score popular usado no ranking."""
+    popularity = pd.Series(range(1, NUM_PRODUCTS + 1), dtype="float64").to_numpy()
+    popularity_service = RecommenderService(
+        model=service.model,
+        df=service.df,
+        encoders=service.encoders,
+        catalog=service.catalog,
+        alpha=0.0,
+        popularity=popularity,
+        background_size=len(service.df),
+        shap_nsamples=50,
+    )
+
+    with TestClient(create_app(service=popularity_service)) as client:
+        resposta = client.post("/recommend", json={"customer_name": "Ana", "top_k": 4})
+
+    assert resposta.status_code == 200
+    corpo = resposta.json()
+    assert corpo["alpha"] == 0.0
+    assert corpo["ranking_mode"] == "popularity"
+    assert corpo["base_value"] is not None
+    for item in corpo["recommendations"]:
+        assert corpo["base_value"] + sum(item["shap"].values()) == pytest.approx(
+            item["score"], abs=1e-3
+        )
+        assert item["shap"]["cliente"] == pytest.approx(0.0, abs=1e-6)
+        assert item["shap"]["categoria"] == pytest.approx(0.0, abs=1e-6)
+        assert item["shap"]["subcategoria"] == pytest.approx(0.0, abs=1e-6)
 
 
 def test_recommend_cold_start(client: TestClient) -> None:
@@ -116,6 +151,7 @@ def test_recommend_cold_start(client: TestClient) -> None:
     corpo = resposta.json()
 
     assert corpo["cold_start"] is True
+    assert corpo["ranking_mode"] == "popularity"
     assert len(corpo["recommendations"]) > 0
     # Sem embedding de cliente não há score neural: a explicação vem vazia.
     for item in corpo["recommendations"]:
