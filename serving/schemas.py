@@ -73,6 +73,14 @@ class HealthResponse(BaseModel):
 
     status: str
     model_loaded: bool
+    base_code: str = Field(
+        default="desconhecida",
+        description="Código da base servida (ex.: sc_base_01), derivado da pasta dos dados.",
+    )
+    variant: str = Field(
+        default="baseline",
+        description="Papel do conjunto servido (MODEL_VARIANT): baseline ou principal.",
+    )
     num_products: int = 0
     num_customers: int = 0
     alpha: float = 0.0

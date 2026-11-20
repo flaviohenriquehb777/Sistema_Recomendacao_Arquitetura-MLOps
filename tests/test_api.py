@@ -71,6 +71,7 @@ def service() -> RecommenderService:
         popularity=popularity,
         background_size=6,
         shap_nsamples=50,
+        base_code="sc_base_01",
     )
 
 
@@ -86,8 +87,17 @@ def test_health(client: TestClient) -> None:
     corpo = resposta.json()
     assert corpo["status"] == "ok"
     assert corpo["model_loaded"] is True
+    assert corpo["base_code"] == "sc_base_01"
+    assert corpo["variant"] == "baseline"
     assert corpo["num_products"] == NUM_PRODUCTS
     assert corpo["num_customers"] == NUM_CUSTOMERS
+
+
+def test_load_exige_data_path(monkeypatch: pytest.MonkeyPatch) -> None:
+    """Sem DATA_PATH o serviço não assume uma base fixa e recusa o carregamento."""
+    monkeypatch.delenv("DATA_PATH", raising=False)
+    with pytest.raises(ValueError, match="DATA_PATH"):
+        RecommenderService.load()
 
 
 def test_recommend_cliente_valido_com_shap(client: TestClient) -> None:

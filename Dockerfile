@@ -44,11 +44,14 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get update \
     && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends libgomp1 \
     && rm -rf /var/lib/apt/lists/*
 
+# A base servida e o papel do conjunto são explícitos: esta imagem entrega o
+# conjunto de sc_base_01 rotulado como BASELINE (não como modelo principal).
 ENV PYTHONUNBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1 \
     PATH="/opt/venv/bin:$PATH" \
     MODELS_DIR=/app/models \
-    DATA_PATH=/app/dados/sc_base_01/sc_base_01_tratado.parquet
+    DATA_PATH=/app/dados/sc_base_01/sc_base_01_tratado.parquet \
+    MODEL_VARIANT=baseline
 
 WORKDIR /app
 

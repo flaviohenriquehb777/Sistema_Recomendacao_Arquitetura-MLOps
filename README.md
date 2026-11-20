@@ -398,16 +398,17 @@ A suíte cobre as utilidades do modelo (criação da NeuMF, prior de popularidad
 
 ## Serviço de Inferência (API)
 
-O modelo treinado é exposto como um serviço REST de **referência** (`serving/`), pronto para ser empacotado e entregue a um time de produção:
+O modelo treinado é exposto como um serviço REST de **referência** (`serving/`), pronto para ser empacotado e entregue a um time de produção. O serviço é **agnóstico de base**: a base servida é declarada em `DATA_PATH` (ex.: `sc_base_01`) e o papel do conjunto em `MODEL_VARIANT` — o conjunto entregue hoje é o de `sc_base_01`, rotulado como **`baseline`**, não como modelo principal da API.
 
-- **`GET /health`** — estado do serviço e dos artefatos carregados;
+- **`GET /health`** — estado do serviço, base servida (`base_code`), papel do conjunto (`variant`) e artefatos carregados;
 - **`POST /recommend`** — top-k com `ranking_mode` explícito (`popularity` ou `hybrid`) e **SHAP aditivo sobre o score efetivamente usado no ranking** (cliente, produto, categoria, subcategoria). Clientes sem histórico (*cold start*) recebem o *fallback* por popularidade, com `cold_start = true` e explicação vazia. O `alpha` é selecionado por validação; nesta base sc_base_01, o modo atual é `popularity`.
 
-O serviço carrega os artefatos (`models/` e `dados/sc_base_01/sc_base_01_tratado.parquet`, versionados no DVC) **uma única vez** no *startup*; se eles não estiverem disponíveis, `/recommend` responde **503** em vez de falhar.
+O serviço carrega os artefatos (`models/` e o parquet indicado por `DATA_PATH`, versionados no DVC) **uma única vez** no *startup*; se eles não estiverem disponíveis, `/recommend` responde **503** em vez de falhar. Sem `DATA_PATH` o serviço não assume nenhuma base e recusa o *startup*.
 
-**Subir localmente** (sem Docker):
+**Subir localmente** (sem Docker) — `DATA_PATH` é obrigatório:
 
 ```bash
+export DATA_PATH=dados/sc_base_01/sc_base_01_tratado.parquet
 uv run uvicorn serving.app:app --host 0.0.0.0 --port 8000
 ```
 

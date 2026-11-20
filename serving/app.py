@@ -63,7 +63,11 @@ def create_app(service: RecommenderService | None = None) -> FastAPI:
 
     app = FastAPI(
         title="Sistema de Recomendação — Serviço de Inferência",
-        description="API de referência para o recomendador híbrido popularity-first (NeuMF).",
+        description=(
+            "API de referência para o recomendador híbrido popularity-first (NeuMF). "
+            "O serviço é agnóstico de base: a base servida é declarada em DATA_PATH "
+            "(ex.: sc_base_01) e seu papel em MODEL_VARIANT (baseline ou principal)."
+        ),
         version="1.0.0",
         lifespan=lifespan,
     )
@@ -76,6 +80,8 @@ def create_app(service: RecommenderService | None = None) -> FastAPI:
         return HealthResponse(
             status="ok",
             model_loaded=True,
+            base_code=svc.base_code,
+            variant=svc.variant,
             num_products=svc.num_products,
             num_customers=svc.num_customers,
             alpha=svc.alpha,

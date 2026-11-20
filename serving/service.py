@@ -14,6 +14,12 @@ Carrega, uma única vez, os artefatos produzidos pelo estágio DVC
 Este módulo NÃO importa ``src.config.paths`` (que exige o CSV bruto). Os
 caminhos dos artefatos vêm de ``MODELS_DIR`` / ``DATA_PATH`` (variáveis de
 ambiente), o que mantém a imagem de container enxuta.
+
+O serviço é **agnóstico de base**: não assume nenhum conjunto de artefatos fixo.
+Quem define o que é servido é ``DATA_PATH``, e o papel do conjunto é declarado
+em ``MODEL_VARIANT``. O conjunto disponível hoje — o de ``sc_base_01`` — está
+rotulado como ``baseline`` (ver ``docs/ROADMAP_RECOMENDACAO_ESCALA.md``), e não
+como modelo principal da API.
 """
 
 from __future__ import annotations
@@ -34,6 +40,11 @@ from src.config.model_utils import (
 )
 
 RANDOM_SEED = 42
+
+# Rótulo do papel do conjunto servido (``MODEL_VARIANT``).
+DEFAULT_VARIANT = "baseline"
+# Usado quando o caminho dos dados não revela a base de origem.
+UNKNOWN_BASE_CODE = "desconhecida"
 
 # Nomes das quatro entradas do NeuMF, na mesma ordem usada no treino.
 SHAP_FEATURES: tuple[str, ...] = ("cliente", "produto", "categoria", "subcategoria")
@@ -65,6 +76,8 @@ class RecommenderService:
         top_k: int = DEFAULT_TOP_K,
         background_size: int = DEFAULT_BACKGROUND_SIZE,
         shap_nsamples: int = DEFAULT_SHAP_NSAMPLES,
+        base_code: str = UNKNOWN_BASE_CODE,
+        variant: str = DEFAULT_VARIANT,
     ) -> None:
         self.model = model
         self.df = df
@@ -74,6 +87,8 @@ class RecommenderService:
         self.popularity = popularity
         self.top_k = int(top_k)
         self.shap_nsamples = int(shap_nsamples)
+        self.base_code = str(base_code)
+        self.variant = str(variant)
 
         self.product_ids, self.category_ids, self.subcategory_ids = catalog
         self.num_products = len(self.product_ids)
@@ -93,14 +108,24 @@ class RecommenderService:
     def load(
         cls, models_dir: str | Path | None = None, data_path: str | Path | None = None
     ) -> RecommenderService:
-        """Carrega os artefatos do disco (modelo, encoders, config do híbrido e dados)."""
+        """Carrega os artefatos do disco (modelo, encoders, config do híbrido e dados).
+
+        A base servida não é fixada em código: vem de ``data_path`` ou da variável
+        de ambiente ``DATA_PATH`` (obrigatória), e o código da base é derivado da
+        pasta do arquivo (``sc_base_01``, ``sc_base_02``, ...). O papel do conjunto
+        é declarado em ``MODEL_VARIANT`` (padrão ``baseline``).
+        """
         models_dir = Path(models_dir or os.environ.get("MODELS_DIR", "models"))
-        data_path = Path(
-            data_path
-            or os.environ.get(
-                "DATA_PATH", "dados/sc_base_01/sc_base_01_tratado.parquet"
+        caminho_dados = data_path or os.environ.get("DATA_PATH")
+        if not caminho_dados:
+            raise ValueError(
+                "Base servida não definida: informe DATA_PATH (variável de "
+                "ambiente) ou o argumento data_path. O serviço não assume um "
+                "conjunto de artefatos fixo."
             )
-        )
+        data_path = Path(caminho_dados)
+        base_code = data_path.parent.name or UNKNOWN_BASE_CODE
+        variant = os.environ.get("MODEL_VARIANT", DEFAULT_VARIANT)
 
         model = tf.keras.models.load_model(models_dir / MODEL_FILENAME)
         config = joblib.load(models_dir / HYBRID_FILENAME)
@@ -120,6 +145,8 @@ class RecommenderService:
             catalog=catalog,
             alpha=config["alpha"],
             popularity=config["popularity"],
+            base_code=base_code,
+            variant=variant,
         )
 
     def _build_background(self, size: int) -> np.ndarray:
