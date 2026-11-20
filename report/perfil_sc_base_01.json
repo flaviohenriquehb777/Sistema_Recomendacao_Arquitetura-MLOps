@@ -1,0 +1,265 @@
+{
+  "base": "sc_base_01_bruto.csv",
+  "volume": {
+    "linhas": 9800,
+    "colunas": 18,
+    "memoria_mb": 9.947
+  },
+  "temporal": {
+    "data_minima": "2015-01-03",
+    "data_maxima": "2018-12-30",
+    "amplitude_dias": 1457,
+    "meses_cobertos": 48,
+    "dias_distintos_com_pedido": 1230,
+    "falhas_de_parsing": 0,
+    "remessas_antes_do_pedido": 0,
+    "prazo_envio_dias_medio": 3.961122,
+    "prazo_envio_dias_p95": 7.0
+  },
+  "duplicatas": {
+    "linhas_duplicadas_integrais": 0,
+    "chave_pedido_produto_repetida": 8,
+    "pedidos_distintos": 4922,
+    "itens_por_pedido_media": 1.991061,
+    "itens_por_pedido_max": 14
+  },
+  "densidade": {
+    "clientes_distintos": 793,
+    "produtos_distintos": 1861,
+    "interacoes": 9800,
+    "pares_cliente_produto_distintos": 9751,
+    "interacoes_por_cliente": {
+      "media": 12.358134,
+      "mediana": 11.0,
+      "p25": 8.0,
+      "p75": 16.0,
+      "max": 35
+    },
+    "interacoes_por_produto": {
+      "media": 5.265986,
+      "mediana": 5.0,
+      "max": 19
+    },
+    "pct_clientes_com_uma_interacao": 0.7566,
+    "pct_produtos_com_uma_interacao": 5.1048,
+    "esparsidade_matriz": 0.993393
+  },
+  "cauda_longa": {
+    "top_1_pct_produtos_share": 2.6633,
+    "top_10_pct_produtos_share": 19.9592,
+    "produtos_para_80_pct_interacoes": 1156,
+    "pct_produtos_para_80_pct_interacoes": 62.1171,
+    "gini_produtos": 0.275541,
+    "gini_clientes": 0.27534
+  },
+  "representatividade": {
+    "Segment": {
+      "valores_distintos": 3,
+      "distribuicao_pct": {
+        "Consumer": 52.051,
+        "Corporate": 30.1327,
+        "Home Office": 17.8163
+      },
+      "razao_maior_menor": 2.921535,
+      "desbalanceada": false
+    },
+    "Region": {
+      "valores_distintos": 4,
+      "distribuicao_pct": {
+        "West": 32.0408,
+        "East": 28.4184,
+        "Central": 23.2347,
+        "South": 16.3061
+      },
+      "razao_maior_menor": 1.964956,
+      "desbalanceada": false
+    },
+    "Category": {
+      "valores_distintos": 3,
+      "distribuicao_pct": {
+        "Office Supplies": 60.2959,
+        "Furniture": 21.2041,
+        "Technology": 18.5
+      },
+      "razao_maior_menor": 3.259239,
+      "desbalanceada": false
+    },
+    "Sub-Category": {
+      "valores_distintos": 17,
+      "distribuicao_pct": {
+        "Binders": 15.2245,
+        "Paper": 13.6531,
+        "Furnishings": 9.5,
+        "Phones": 8.9388,
+        "Storage": 8.4898,
+        "Art": 8.0102,
+        "Accessories": 7.7143,
+        "Chairs": 6.1939,
+        "Appliances": 4.6837,
+        "Labels": 3.6429,
+        "Tables": 3.2041,
+        "Envelopes": 2.5306,
+        "Bookcases": 2.3061,
+        "Fasteners": 2.1837,
+        "Supplies": 1.8776,
+        "Machines": 1.1735,
+        "Copiers": 0.6735
+      },
+      "razao_maior_menor": 22.606061,
+      "desbalanceada": true
+    }
+  },
+  "esquema": [
+    {
+      "coluna": "Row ID",
+      "tipo": "int64",
+      "nulos": 0,
+      "pct_nulos": 0.0,
+      "unicos": 9800,
+      "valor_modal": null
+    },
+    {
+      "coluna": "Order ID",
+      "tipo": "object",
+      "nulos": 0,
+      "pct_nulos": 0.0,
+      "unicos": 4922,
+      "valor_modal": null
+    },
+    {
+      "coluna": "Order Date",
+      "tipo": "object",
+      "nulos": 0,
+      "pct_nulos": 0.0,
+      "unicos": 1230,
+      "valor_modal": null
+    },
+    {
+      "coluna": "Ship Date",
+      "tipo": "object",
+      "nulos": 0,
+      "pct_nulos": 0.0,
+      "unicos": 1326,
+      "valor_modal": null
+    },
+    {
+      "coluna": "Ship Mode",
+      "tipo": "object",
+      "nulos": 0,
+      "pct_nulos": 0.0,
+      "unicos": 4,
+      "valor_modal": "Standard Class"
+    },
+    {
+      "coluna": "Customer ID",
+      "tipo": "object",
+      "nulos": 0,
+      "pct_nulos": 0.0,
+      "unicos": 793,
+      "valor_modal": null
+    },
+    {
+      "coluna": "Customer Name",
+      "tipo": "object",
+      "nulos": 0,
+      "pct_nulos": 0.0,
+      "unicos": 793,
+      "valor_modal": null
+    },
+    {
+      "coluna": "Segment",
+      "tipo": "object",
+      "nulos": 0,
+      "pct_nulos": 0.0,
+      "unicos": 3,
+      "valor_modal": "Consumer"
+    },
+    {
+      "coluna": "Country",
+      "tipo": "object",
+      "nulos": 0,
+      "pct_nulos": 0.0,
+      "unicos": 1,
+      "valor_modal": "United States"
+    },
+    {
+      "coluna": "City",
+      "tipo": "object",
+      "nulos": 0,
+      "pct_nulos": 0.0,
+      "unicos": 529,
+      "valor_modal": null
+    },
+    {
+      "coluna": "State",
+      "tipo": "object",
+      "nulos": 0,
+      "pct_nulos": 0.0,
+      "unicos": 49,
+      "valor_modal": "California"
+    },
+    {
+      "coluna": "Postal Code",
+      "tipo": "float64",
+      "nulos": 11,
+      "pct_nulos": 0.1122,
+      "unicos": 626,
+      "valor_modal": null
+    },
+    {
+      "coluna": "Region",
+      "tipo": "object",
+      "nulos": 0,
+      "pct_nulos": 0.0,
+      "unicos": 4,
+      "valor_modal": "West"
+    },
+    {
+      "coluna": "Product ID",
+      "tipo": "object",
+      "nulos": 0,
+      "pct_nulos": 0.0,
+      "unicos": 1861,
+      "valor_modal": null
+    },
+    {
+      "coluna": "Category",
+      "tipo": "object",
+      "nulos": 0,
+      "pct_nulos": 0.0,
+      "unicos": 3,
+      "valor_modal": "Office Supplies"
+    },
+    {
+      "coluna": "Sub-Category",
+      "tipo": "object",
+      "nulos": 0,
+      "pct_nulos": 0.0,
+      "unicos": 17,
+      "valor_modal": "Binders"
+    },
+    {
+      "coluna": "Product Name",
+      "tipo": "object",
+      "nulos": 0,
+      "pct_nulos": 0.0,
+      "unicos": 1849,
+      "valor_modal": null
+    },
+    {
+      "coluna": "Sales",
+      "tipo": "float64",
+      "nulos": 0,
+      "pct_nulos": 0.0,
+      "unicos": 5757,
+      "valor_modal": null
+    }
+  ],
+  "limitacoes_conhecidas": [
+    "Matriz cliente x produto com esparsidade de 0.9934 (9751 pares observados para 793 clientes x 1861 produtos): qualquer métrica de ranking tem alta variância e deve ser lida com intervalo de confiança.",
+    "Sinal de interação exclusivamente positivo (compra registrada). Não há evento de impressão/exposição, portanto não é possível distinguir 'não gostou' de 'não viu' — o modelo é avaliado por relevância observada, nunca por taxa de clique.",
+    "Ship Date é posterior ao evento de compra: não pode ser usada como atributo de entrada sob um protocolo temporal honesto.",
+    "8 linhas repetem a chave (Order ID, Product ID): a agregação precisa ser definida por cliente-item.",
+    "A granularidade da linha é item de pedido: itens comprados no mesmo pedido co-ocorrem por decisão de compra, o que infla a similaridade item-item se ignorada a estrutura do pedido."
+  ]
+}

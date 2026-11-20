@@ -1,7 +1,10 @@
 # Pipeline DVC — Sistema de Recomendação de Produtos
 # ---------------------------------------------------------------------------
-# Grafo: preparacao_dados gera o parquet tratado, consumido em PARALELO por
-# treinamento_modelo e treinamento_ensemble (estágios independentes entre si):
+# Grafo: perfil_dados audita a base bruta; preparacao_dados gera o parquet
+# tratado, consumido em PARALELO por treinamento_modelo e treinamento_ensemble
+# (estágios independentes entre si):
+#
+#     perfil_dados       (auditoria de qualidade — independe da preparação)
 #
 #     preparacao_dados ──┬──> treinamento_modelo
 #                       └──> treinamento_ensemble
@@ -13,6 +16,17 @@
 # garantindo que o DVC só re-execute o necessário quando algo mudar.
 # ---------------------------------------------------------------------------
 stages:
+
+  perfil_dados:
+    desc: "Audita a base bruta de sc_base_01 (volume, esquema, densidade, cauda longa, limitações)."
+    cmd: python -m src.scripts.perfil_dados
+    deps:
+      - src/scripts/perfil_dados.py
+      - src/config/paths.py
+      - dados/sc_base_01/sc_base_01_bruto.csv
+    metrics:
+      - report/perfil_sc_base_01.json:
+          cache: false
 
   preparacao_dados:
     desc: "Converte o CSV bruto em Parquet tratado (nulos de 'Postal Code' + downcast)."
