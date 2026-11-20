@@ -352,7 +352,7 @@ Sistema_Recomendacao_Arquitetura-MLOps/
 ├── serving/                   # Serviço de inferência (FastAPI): app, service, schemas
 ├── tests/                     # pytest (utilidades do modelo, sistema e API)
 ├── report/                    # Figuras SHAP e métricas dos benchmarks (JSON)
-├── docs/                      # Guias (OPTIMIZATION_GUIDE.md, SYNC_GUIDE.md, ROADMAP_RECOMENDACAO_ESCALA.md)
+├── docs/                      # Documentação (roadmap da recomendação em escala)
 ├── .github/workflows/ci.yml   # CI/CD
 ├── Dockerfile · .dockerignore # Empacotamento do serviço (multi-stage, non-root)
 ├── dvc.yaml · .dvc/           # Pipeline e remote DagsHub

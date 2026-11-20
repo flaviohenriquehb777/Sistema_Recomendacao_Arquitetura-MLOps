@@ -55,7 +55,7 @@ jobs:
         echo "Validating project structure..."
 
         # Check main directories
-        for dir in src tests scripts; do
+        for dir in src tests serving docs; do
           if [ -d "$dir" ]; then
             echo "✓ Directory $dir exists"
           else
