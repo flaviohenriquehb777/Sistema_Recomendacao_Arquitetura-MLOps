@@ -10,6 +10,11 @@ __pycache__/
 *.log
 logs/
 models/
+*.keras
+*.tfevents.*
+
+# Relatórios gerados (podem conter dados de clientes) — nunca versionar
+report/*.pdf
 
 # MLflow (backend local offline)
 mlruns/
