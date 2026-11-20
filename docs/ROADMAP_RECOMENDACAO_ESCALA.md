@@ -49,6 +49,12 @@ Aplica-se a **todas** as bases, antes de qualquer modelagem.
 
 **Saída:** relatório de qualidade da base e decisão registrada sobre seu uso como baseline.
 
+**Status:** concluída (20/11/2026). Relatório reprodutível em `report/perfil_sc_base_01.json`, produzido pelo estágio DVC `perfil_dados` — 9.800 linhas, 793 clientes, 1.861 produtos, esparsidade 0,9934, top 10 % dos produtos concentrando 19,96 % das interações.
+
+**Decisão:** `sc_base_01` é o **baseline** do projeto, não o modelo principal da API. O serviço é agnóstico de base — `DATA_PATH` declara o parquet servido e `MODEL_VARIANT` declara o papel do conjunto (hoje `baseline`, exposto em `GET /health`). O modelo principal só será definido quando existir treino em `sc_base_02`/`sc_base_03` (Etapas 2–4); até lá o `alpha = 0,0` selecionado por validação mantém o modo `popularity` nesta base.
+
+**Higiene de dados:** o CSV bruto de `sc_base_01` deixou de ser versionado (passou a `dados/.gitignore`), cumprindo a política de dados brutos fora do Git. A validação de existência foi movida do import para o uso, para que o código seja importável em clone limpo.
+
 ### 2. Ingestão, entendimento e tratamento de `sc_base_02`
 
 - Ler transações, clientes e artigos sem descartar data, IDs ou atributos relevantes.
