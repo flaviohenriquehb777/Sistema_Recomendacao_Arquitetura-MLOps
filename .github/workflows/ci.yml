@@ -13,12 +13,15 @@ jobs:
 
     steps:
     - name: Checkout code
-      uses: actions/checkout@v4
+      uses: actions/checkout@v5
 
     # uv é a fonte única do ambiente (pyproject.toml + uv.lock). O setup-uv
     # instala o Python 3.11 (versão exigida em requires-python) e habilita o cache.
     - name: Install uv
-      uses: astral-sh/setup-uv@v5
+      # setup-uv não publica alias de major flutuante: a versão é fixada na
+      # release exata que já roda em Node 24 (a linha v5 emitia aviso de
+      # depreciação do Node 20 no runner).
+      uses: astral-sh/setup-uv@v10.3.3
       with:
         python-version: '3.11'
         enable-cache: true
@@ -45,7 +48,7 @@ jobs:
 
     steps:
     - name: Checkout code
-      uses: actions/checkout@v4
+      uses: actions/checkout@v5
 
     - name: Validate project structure
       run: |
