@@ -243,7 +243,7 @@ def main() -> None:
         top_k=TOP_K, popularity=popularity, alpha=alpha,
     )
     print("\n" + "=" * 70)
-    print(f"RECOMENDAÇÕES PARA: {cliente_demo}")
+    print("RECOMENDAÇÕES PARA: cliente de exemplo (identificador anonimizado)")
     print("=" * 70)
     print(recomendacoes.to_string(index=False))
     print("=" * 70)

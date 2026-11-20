@@ -155,7 +155,7 @@ class TestModelIntegration(unittest.TestCase):
         expected_files = [
             'src/config/paths.py',
             'src/config/model_utils.py',
-            'src/config/dagshub_config.py',
+            'src/config/mlflow_tracking.py',
             'requirements.txt',
             'README.md'
         ]

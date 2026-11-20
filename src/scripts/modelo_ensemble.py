@@ -644,7 +644,7 @@ def main():
         return result
     
     # Testar recomendações
-    cliente_teste = "Darrin Van Huff"
+    cliente_teste = customer_encoder.classes_[0]  # cliente de exemplo (identificador anonimizado)
     encoders = (customer_encoder, product_encoder, category_encoder, subcategory_encoder, scaler)
     
     recomendacoes_ensemble = recomendar_produtos_ensemble(
@@ -652,7 +652,7 @@ def main():
     )
     
     print(f"\n{'='*70}")
-    print(f"RECOMENDAÇÕES ENSEMBLE PARA: {cliente_teste}")
+    print("RECOMENDAÇÕES ENSEMBLE PARA: cliente de exemplo (identificador anonimizado)")
     print(f"{'='*70}")
     print(recomendacoes_ensemble)
     print(f"{'='*70}")

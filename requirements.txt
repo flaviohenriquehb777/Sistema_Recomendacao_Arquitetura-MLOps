@@ -36,7 +36,8 @@ anyio==4.14.2
     # via
     #   fastapi
     #   gql
-    #   httpcore
+    #   httpx
+    #   httpx2
     #   jupyter-server
     #   mlflow-skinny
     #   starlette
@@ -222,7 +223,9 @@ entrypoints==0.4.2
 executing==2.3.0
     # via stack-data
 fastapi==0.163.2
-    # via mlflow-skinny
+    # via
+    #   mlflow-skinny
+    #   sistema-recomendacao-mlops
 fastjsonschema==2.22.3
     # via nbformat
 filelock==4.2.12
@@ -301,18 +304,23 @@ gto==1.8.0
     # via dvc
 gunicorn==21.2.0 ; sys_platform != 'win32'
     # via mlflow
-h11==0.14.0
+h11==0.16.0
     # via
     #   httpcore
+    #   httpcore2
     #   uvicorn
 h5py==3.16.0
     # via
     #   keras
     #   tensorflow
-httpcore==0.16.3
+httpcore==1.0.9
     # via httpx
-httpx==0.23.3
+httpcore2==2.16.2 ; sys_platform != 'emscripten'
+    # via httpx2
+httpx==0.28.1
     # via dagshub
+httpx2==2.16.2
+    # via sistema-recomendacao-mlops
 huey==3.5.4
     # via mlflow
 hydra-core==1.3.8
@@ -322,9 +330,10 @@ identify==2.6.20
 idna==3.20
     # via
     #   anyio
+    #   httpx
+    #   httpx2
     #   jsonschema
     #   requests
-    #   rfc3986
     #   yarl
 importlib-metadata==6.11.0
     # via mlflow-skinny
@@ -461,7 +470,7 @@ markupsafe==3.0.4
     #   werkzeug
 marshmallow==3.26.2
     # via dataclasses-json
-matplotlib==3.11.2
+matplotlib==3.10.9
     # via
     #   mlflow
     #   seaborn
@@ -710,7 +719,7 @@ pyparsing==3.0.9
     #   grandalf
     #   matplotlib
     #   pydot
-pytest==9.2.0
+pytest==8.4.2
     # via
     #   pytest-cov
     #   sistema-recomendacao-mlops
@@ -792,8 +801,6 @@ rfc3339-validator==0.1.4
     # via
     #   jsonschema
     #   jupyter-events
-rfc3986==1.5.0
-    # via httpx
 rfc3986-validator==0.1.1
     # via
     #   jsonschema
@@ -874,10 +881,6 @@ slicer==0.0.8
     # via shap
 smmap==5.0.3
     # via gitdb
-sniffio==1.3.1
-    # via
-    #   httpcore
-    #   httpx
 soupsieve==2.10 ; python_full_version < '3.11.5'
     # via beautifulsoup4
 soupsieve==4.1.1 ; python_full_version >= '3.11.5'
@@ -958,6 +961,10 @@ traitlets==5.16.1
     #   qtconsole
 treelib==1.6.4
     # via dagshub
+truststore==0.10.5 ; sys_platform != 'emscripten'
+    # via
+    #   httpcore2
+    #   httpx2
 typer==0.24.2
     # via gto
 typing-extensions==4.16.0
@@ -972,6 +979,7 @@ typing-extensions==4.16.0
     #   dulwich
     #   fastapi
     #   graphene
+    #   httpx2
     #   jupyter-client
     #   mlflow-skinny
     #   opentelemetry-api
@@ -1011,7 +1019,9 @@ urllib3==2.8.0
     #   dulwich
     #   requests
 uvicorn==0.54.0
-    # via mlflow-skinny
+    # via
+    #   mlflow-skinny
+    #   sistema-recomendacao-mlops
 vine==5.1.0
     # via
     #   amqp

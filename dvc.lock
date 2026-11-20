@@ -13,12 +13,12 @@ stages:
       size: 892
     - path: src/config/paths.py
       hash: md5
-      md5: 30817b21af42bcc507a59bfaf1a586cc
-      size: 1147
+      md5: 48b36b810485ed7b444901a2511b341b
+      size: 1591
     - path: src/scripts/preparar_dados.py
       hash: md5
-      md5: b694ca955fe0f0adafe9ab16601839fa
-      size: 2689
+      md5: dfabb046051f2222a1ea0dcc0250cbf6
+      size: 2695
     outs:
     - path: dados/sc_base_01/sc_base_01_tratado.parquet
       hash: md5
@@ -37,24 +37,24 @@ stages:
       size: 892
     - path: src/config/mlflow_tracking.py
       hash: md5
-      md5: b2e5e648c781527d7d2a43d424156c93
-      size: 9348
+      md5: 36a3827fcca7ad7466d2927b2d39b8fb
+      size: 9353
     - path: src/config/model_utils.py
       hash: md5
-      md5: da9604a959ebebe829af65f2a3d78c64
-      size: 32427
+      md5: 1653165de4a79065bbb5109575b6dd63
+      size: 31323
     - path: src/config/paths.py
       hash: md5
-      md5: 30817b21af42bcc507a59bfaf1a586cc
-      size: 1147
+      md5: 48b36b810485ed7b444901a2511b341b
+      size: 1591
     - path: src/scripts/otimizacao_modelo.py
       hash: md5
-      md5: 0dcf5ae472724ffd6843f867dad3e7f1
-      size: 10720
+      md5: ec6ceb5a99b0fbe7bf9cf4f1aa3d69e0
+      size: 10727
     outs:
     - path: models/best_model_recomendacao_otimizado.keras
       hash: md5
-      md5: 47759171ac2d75891c683d84f8ef04d7
+      md5: bf3292978fa1c38941fbd254c99dc149
       size: 1195566
     - path: models/category_encoder_otimizado.pkl
       hash: md5
@@ -89,16 +89,16 @@ stages:
       size: 892
     - path: src/config/paths.py
       hash: md5
-      md5: 30817b21af42bcc507a59bfaf1a586cc
-      size: 1147
+      md5: 48b36b810485ed7b444901a2511b341b
+      size: 1591
     - path: src/scripts/modelo_ensemble.py
       hash: md5
-      md5: c4e3673ef76b617a52d650cfe406edc3
-      size: 25641
+      md5: 93861b7ece49b67a00c9d87cdd93c89a
+      size: 25708
     outs:
     - path: models/ensemble/
       hash: md5
-      md5: a050a3020d4a26594f00d966d16d29d1.dir
+      md5: ff18ba64a698ae0b14b3e65c3b7f4575.dir
       size: 76640766
       nfiles: 12
   benchmark_publico_sc_base_03:
@@ -122,24 +122,24 @@ stages:
       size: 408929907
     - path: src/config/mlflow_tracking.py
       hash: md5
-      md5: b2e5e648c781527d7d2a43d424156c93
-      size: 9348
+      md5: 36a3827fcca7ad7466d2927b2d39b8fb
+      size: 9353
     - path: src/config/model_utils.py
       hash: md5
-      md5: da9604a959ebebe829af65f2a3d78c64
-      size: 32427
+      md5: 1653165de4a79065bbb5109575b6dd63
+      size: 31323
     - path: src/config/paths.py
       hash: md5
-      md5: 30817b21af42bcc507a59bfaf1a586cc
-      size: 1147
+      md5: 48b36b810485ed7b444901a2511b341b
+      size: 1591
     - path: src/config/sc_base_03_data.py
       hash: md5
-      md5: 002fd66b36786728289bccb6ff6cf529
-      size: 8317
+      md5: eee274a3a1dea821e95e61645d581152
+      size: 8324
     - path: src/scripts/benchmark_sc_base_03.py
       hash: md5
-      md5: f87d6672f1a60f1a97e040666ea7a9f6
-      size: 11511
+      md5: b19137d447a9f7d7a0c3b837b89a61ee
+      size: 11365
     outs:
     - path: dados/sc_base_03/benchmark_sc_base_03.parquet
       hash: md5
@@ -149,3 +149,79 @@ stages:
       hash: md5
       md5: 7244f63aba59ebb1286728ebebd20b7c
       size: 1996
+  perfil_dados:
+    cmd: python -m src.scripts.perfil_dados
+    deps:
+    - path: dados/sc_base_01/sc_base_01_bruto.csv
+      hash: md5
+      md5: 1948e384d90182c0a70264f443fd49db
+      size: 2139490
+    - path: src/config/paths.py
+      hash: md5
+      md5: 48b36b810485ed7b444901a2511b341b
+      size: 1591
+    - path: src/scripts/perfil_dados.py
+      hash: md5
+      md5: e1ab0325316b97c77566ba89d5935b63
+      size: 13197
+    outs:
+    - path: report/perfil_sc_base_01.json
+      hash: md5
+      md5: 3570655fee05fe7a8294a6ed14e3a383
+      size: 6895
+  perfil_sc_base_04:
+    cmd: python -m src.scripts.perfil_sc_base_04
+    deps:
+    - path: dados/sc_base_04/2019-Nov.csv
+      hash: md5
+      md5: adb30f47f484639039c726a0e404ebd9
+      size: 9006762395
+    - path: dados/sc_base_04/2019-Oct.csv
+      hash: md5
+      md5: ef428b65c1a12d8b1d39610b341d9b26
+      size: 5668612855
+    - path: src/config/paths.py
+      hash: md5
+      md5: 48b36b810485ed7b444901a2511b341b
+      size: 1591
+    - path: src/scripts/perfil_sc_base_04.py
+      hash: md5
+      md5: 94076d3146e4179158fd80b96ab58f07
+      size: 15974
+    outs:
+    - path: report/perfil_sc_base_04.json
+      hash: md5
+      md5: 9c89517ecb0e21b8b60c8666806c90b7
+      size: 3368
+  benchmark_escala_sc_base_04:
+    cmd: python -m src.scripts.benchmark_sc_base_04
+    deps:
+    - path: dados/sc_base_04/2019-Nov.csv
+      hash: md5
+      md5: adb30f47f484639039c726a0e404ebd9
+      size: 9006762395
+    - path: dados/sc_base_04/2019-Oct.csv
+      hash: md5
+      md5: ef428b65c1a12d8b1d39610b341d9b26
+      size: 5668612855
+    - path: src/config/avaliacao_ranking.py
+      hash: md5
+      md5: f9fa3c71924bab8816837674b86b8074
+      size: 13965
+    - path: src/config/model_utils.py
+      hash: md5
+      md5: 1653165de4a79065bbb5109575b6dd63
+      size: 31323
+    - path: src/config/paths.py
+      hash: md5
+      md5: 48b36b810485ed7b444901a2511b341b
+      size: 1591
+    - path: src/scripts/benchmark_sc_base_04.py
+      hash: md5
+      md5: 3c01f4a1ffccffe078b2abb743c81757
+      size: 26738
+    outs:
+    - path: report/benchmark_sc_base_04_metricas.json
+      hash: md5
+      md5: 17fe7f8d90e9e3bf45456cf88c1b74c3
+      size: 6929

@@ -73,7 +73,7 @@
       "cobertura_catalogo": 0.0001047150323188668,
       "novidade": 18.13236501989859,
       "diversidade_categoria": 1.0,
-      "segundos": 189.05
+      "segundos": 117.36
     },
     "mais_populares": {
       "ndcg@10": 0.041695356877864735,
@@ -93,7 +93,7 @@
       "cobertura_catalogo": 0.00043789922606071567,
       "novidade": 8.180205336448026,
       "diversidade_categoria": 0.11144200000000004,
-      "segundos": 157.05
+      "segundos": 153.46
     },
     "recencia": {
       "ndcg@10": 0.04017064780600972,
@@ -113,7 +113,7 @@
       "cobertura_catalogo": 0.00039982103249021865,
       "novidade": 8.311478693500883,
       "diversidade_categoria": 0.19755800000000004,
-      "segundos": 4872.05
+      "segundos": 166.37
     },
     "item_knn": {
       "ndcg@10": 0.10739786793451536,
@@ -133,7 +133,7 @@
       "cobertura_catalogo": 0.4504269517454092,
       "novidade": 14.115355181807189,
       "diversidade_categoria": 0.261606,
-      "segundos": 113.89
+      "segundos": 111.84
     },
     "als": {
       "ndcg@10": 0.09460283770838458,
@@ -153,7 +153,7 @@
       "cobertura_catalogo": 0.01878206897864765,
       "novidade": 10.583724108722958,
       "diversidade_categoria": 0.22246400000000002,
-      "segundos": 153.34
+      "segundos": 134.36
     },
     "hibrido_popularity_first": {
       "ndcg@10": 0.09471461416854689,
@@ -173,7 +173,7 @@
       "cobertura_catalogo": 0.012622921168619761,
       "novidade": 10.185827920526433,
       "diversidade_categoria": 0.228196,
-      "segundos": 236.52
+      "segundos": 233.46
     },
     "hibrido_knn_als": {
       "ndcg@10": 0.12565000676348698,
@@ -193,7 +193,7 @@
       "cobertura_catalogo": 0.28217845345416814,
       "novidade": 11.575490393786174,
       "diversidade_categoria": 0.18958600000000003,
-      "segundos": 358.56
+      "segundos": 347.56
     }
   },
   "comparacao": {

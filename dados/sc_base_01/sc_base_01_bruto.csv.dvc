@@ -1,0 +1,5 @@
+outs:
+- md5: 1948e384d90182c0a70264f443fd49db
+  size: 2139490
+  hash: md5
+  path: sc_base_01_bruto.csv

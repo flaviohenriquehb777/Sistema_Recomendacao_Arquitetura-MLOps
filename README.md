@@ -102,7 +102,7 @@ Na etapa de preparação da `sc_base_01` (`src/scripts/preparar_dados.py`) são 
 | Categorias / Subcategorias | 3 / 17 |
 | Pares treino / validação / teste | 8.171 / 776 / 776 |
 | Amostras de treino (positivos + negativos) | 73.539 |
-| Itens por cliente (média / mediana / máx.) | 12,30 / 11 / 34 |
+| Itens por cliente (média / mediana / máx.) | 12,36 / 11 / 35 |
 | Densidade da matriz cliente × produto | 0,6607 % |
 
 </div>
@@ -338,9 +338,7 @@ Sistema_Recomendacao_Arquitetura-MLOps/
 │   │   ├── paths.py           # Caminhos canônicos do projeto
 │   │   ├── sc_base_03_data.py # Preparo da base pública sc_base_03 (benchmark real)
 │   │   ├── auxiliares_ml.py   # Utilitários de preparação de dados (downcast)
-│   │   ├── mlflow_tracking.py # Setup do MLflow (SQLite/DagsHub) e registro
-│   │   ├── dagshub_config.py  # Integração DagsHub ↔ MLflow
-│   │   └── experiment_tracker.py # Registro de experimentos
+│   │   └── mlflow_tracking.py # Setup do MLflow (SQLite/DagsHub) e registro
 │   └── scripts/
 │       ├── perfil_dados.py        # Auditoria de qualidade da base bruta
 │       ├── perfil_sc_base_04.py   # Auditoria do log de eventos em escala (sc_base_04)
