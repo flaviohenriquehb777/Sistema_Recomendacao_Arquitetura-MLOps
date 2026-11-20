@@ -1,7 +1,7 @@
 """
 Testes da API de inferência (``serving/app.py``) usando o ``TestClient`` do FastAPI.
 
-Usa um recomendador SINTÉTICO pequeno, construído em memória, para não depender
+Usa um recomendador mínimo, construído em memória, para não depender
 dos artefatos versionados no DVC nem da base real — assim os testes são rápidos
 e reprodutíveis em qualquer ambiente, inclusive no CI (onde `models/` e
 `sc_base_01_tratado.parquet` não estão no git).
@@ -26,7 +26,7 @@ NUM_CUSTOMERS, NUM_PRODUCTS, NUM_CATEGORIES, NUM_SUBCATEGORIES = 3, 6, 3, 3
 SHAP_FEATURES = {"cliente", "produto", "categoria", "subcategoria"}
 
 
-def _dados_sinteticos() -> pd.DataFrame:
+def _dados_minimos() -> pd.DataFrame:
     """Base mínima: 3 clientes, 6 produtos, 2 itens vistos por cliente."""
     return pd.DataFrame(
         {
@@ -41,8 +41,8 @@ def _dados_sinteticos() -> pd.DataFrame:
 
 @pytest.fixture(scope="module")
 def service() -> RecommenderService:
-    """Recomendador sintético (modelo NeuMF mínimo + encoders + catálogo)."""
-    df = _dados_sinteticos()
+    """Recomendador mínimo (modelo NeuMF + encoders + catálogo)."""
+    df = _dados_minimos()
     encoders = {
         "customer": LabelEncoder().fit(df["Customer Name"]),
         "product": LabelEncoder().fit(df["Product ID"]),

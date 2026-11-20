@@ -32,7 +32,7 @@ class TestModelUtils(unittest.TestCase):
         np.random.seed(42)
         tf.keras.utils.set_random_seed(42)
 
-        # Dimensões sintéticas do problema
+        # Dimensões do problema de teste
         self.num_customers = 100
         self.num_products = 50
         self.num_categories = 5

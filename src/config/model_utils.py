@@ -50,7 +50,7 @@ from tensorflow.keras import layers, regularizers
 
 RANDOM_SEED = 42
 
-# Alvo k padrão (07 recomendações, conforme o escopo do projeto).
+# Alvo k padrão do pipeline NeuMF (07 recomendações, conforme o escopo do projeto).
 TOP_K = 7
 
 
@@ -558,36 +558,6 @@ def evaluate_hybrid(
     """
     customers, seen_by_customer, relevant_by_customer = _eval_context(train_pairs, eval_pairs)
     scores = combine_scores(score_catalog(model, customers, catalog), popularity, alpha)
-    metricas = _ranking_metrics_from_scores(
-        scores, seen_by_customer, relevant_by_customer, customers, k
-    )
-    metricas["num_customers"] = float(len(customers))
-    metricas["num_products"] = float(scores.shape[1])
-    return metricas
-
-
-def evaluate_from_scores(
-    scores: np.ndarray,
-    train_pairs: pd.DataFrame,
-    eval_pairs: pd.DataFrame,
-    k: int = TOP_K,
-) -> dict[str, float]:
-    """
-    Calcula as métricas de ranking a partir de uma matriz de scores já pronta.
-
-    Útil para avaliar qualquer sinal sob exatamente o mesmo protocolo de
-    ``evaluate_ranking`` (leave-last-out, exclusão dos itens vistos) — por
-    exemplo o **teto teórico** dado pelos fatores latentes verdadeiros de uma
-    base sintética.
-
-    Args:
-        scores: matriz ``(n_clientes, n_produtos)``; a linha ``i`` corresponde ao
-            i-ésimo cliente de ``sorted(eval_pairs["c"].unique())``.
-
-    Returns:
-        O mesmo dicionário de métricas de ``evaluate_ranking``.
-    """
-    customers, seen_by_customer, relevant_by_customer = _eval_context(train_pairs, eval_pairs)
     metricas = _ranking_metrics_from_scores(
         scores, seen_by_customer, relevant_by_customer, customers, k
     )

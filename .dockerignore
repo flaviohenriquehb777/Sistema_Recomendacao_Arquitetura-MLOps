@@ -25,5 +25,6 @@ mlruns
 
 # Apenas `dados/sc_base_01/sc_base_01_tratado.parquet` é consumido pelo serviço.
 dados/sc_base_03
+dados/sc_base_04
+dados/sc_base_05
 dados/sc_base_01/sc_base_01_bruto.csv
-dados/benchmark_sintetico.parquet

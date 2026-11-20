@@ -94,8 +94,8 @@ def log_run(params: dict, metrics: dict, artifacts=None, run_name="run"):
     Registra **parâmetros**, **métricas** e (opcionalmente) **artefatos** de um
     run — SEM registrar o modelo no Model Registry.
 
-    Indicada para estágios que não precisam versionar o modelo neural (ex.: o
-    benchmark de escala sobre a base sintética).
+    Indicada para estágios que não precisam versionar o modelo neural (ex.:
+    avaliações que não geram artefato de produção).
 
     Não-bloqueante: qualquer falha (servidor indisponível, valor inválido, etc.)
     é avisada e ignorada, sem interromper o pipeline.

@@ -7,7 +7,7 @@ cobertura temporal, densidade do sinal de interação, cauda longa,
 representatividade das categorias e limitações conhecidas.
 
 Princípios:
-    - Nenhum número é estimado ou sintetizado: tudo é medido na base bruta.
+    - Nenhum número é estimado ou presumido: tudo é medido na base bruta.
     - A saída é determinística (sem carimbo de tempo), para que o DVC só
       detecte mudança quando a base ou o código mudarem de fato.
 

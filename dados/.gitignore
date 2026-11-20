@@ -1,7 +1,10 @@
 /sc_base_01/sc_base_01_tratado.parquet
 # CSV bruto da base sc_base_01 — contém dados de clientes; armazenado fora do git.
 /sc_base_01/sc_base_01_bruto.csv
-/benchmark_sintetico.parquet
 /sc_base_03/benchmark_sc_base_03.parquet
 # CSVs brutos da base sc_base_03 (~1 GB) — não versionados.
 /sc_base_03/*.csv
+# sc_base_04 — eventos de interação (visualização, carrinho e compra) em escala. Nada é versionado.
+/sc_base_04/
+# sc_base_05 — eventos de interação de outra categoria. Nada é versionado.
+/sc_base_05/

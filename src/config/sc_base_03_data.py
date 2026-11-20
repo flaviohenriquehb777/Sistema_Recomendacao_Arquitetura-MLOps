@@ -5,7 +5,7 @@ Origem e honestidade
 --------------------
 A ``sc_base_03`` é um *log de eventos* real de um site de e-commerce, cobrindo
 ~4,5 meses, distribuído para uso em pesquisa e **anonimizado** (não há nomes de
-produto nem de cliente). É **dado real**, não sintético.
+produto nem de cliente). É **dado real**, coletado em produção.
 
 Eventos (``events.csv``): ``timestamp, visitorid, event, itemid, transactionid``,
 com ``event`` ∈ {``view``, ``addtocart``, ``transaction``}. Tratamos o conjunto

@@ -5,8 +5,7 @@ anonimizado) — roda o pipeline de recomendação REAL e reporta métricas reai
 Motivação
 ---------
 A base própria (`sc_base_01`) é pequena e esparsa demais para um modelo neural
-superar a popularidade. A base sintética demonstra a arquitetura, mas é, por
-construção, circular. A `sc_base_03` fecha essa lacuna: é um **log de eventos
+superar a popularidade. A `sc_base_03` fecha essa lacuna: é um **log de eventos
 real** de um site de e-commerce, com sinal implícito de verdade (``view``,
 ``addtocart``, ``transaction``) — o cenário em que um recomendador prova valor.
 
@@ -96,8 +95,7 @@ def main() -> None:
     print("=" * 70)
 
     # Tracking MLflow (não-bloqueante). Experimento PRÓPRIO do benchmark público,
-    # para separar esta demonstração (dado real) do benchmark sintético e do
-    # modelo de produção.
+    # para separar esta demonstração do modelo de produção.
     setup_mlflow(experiment_name="recomendacao_benchmark_publico")
 
     # --- Base sc_base_03 (preparada a partir dos brutos locais) --------------
