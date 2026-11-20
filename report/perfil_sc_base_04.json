@@ -1,0 +1,129 @@
+{
+  "base": "sc_base_04",
+  "volume": {
+    "eventos": 109950743,
+    "colunas": 9
+  },
+  "temporal": {
+    "evento_minimo": "2019-10-01 00:00:00 UTC",
+    "evento_maximo": "2019-11-30 23:59:59 UTC",
+    "dias_distintos": 61
+  },
+  "eventos_por_tipo": {
+    "cart": {
+      "eventos": 3955446,
+      "pct": 3.5975
+    },
+    "purchase": {
+      "eventos": 1659788,
+      "pct": 1.5096
+    },
+    "view": {
+      "eventos": 104335509,
+      "pct": 94.893
+    }
+  },
+  "razao_tipo_maior_menor": 62.860744,
+  "tipos_evento_desbalanceados": true,
+  "cardinalidade": {
+    "usuarios": 5316649,
+    "produtos": 206876,
+    "categorias": 691,
+    "codigos_categoria": 129,
+    "marcas": 4302
+  },
+  "densidade": {
+    "interacoes": 109950743,
+    "pares_usuario_produto_distintos": 56371590,
+    "esparsidade_matriz": 0.999949,
+    "interacoes_por_usuario": {
+      "entidades": 5316649,
+      "interacoes": 109950743,
+      "media": 20.680459,
+      "mediana": 5.0,
+      "p90": 51.0,
+      "p99": 225.0,
+      "max": 22929,
+      "pct_com_uma_interacao": 21.1588
+    },
+    "interacoes_por_produto": {
+      "entidades": 206876,
+      "interacoes": 109950743,
+      "media": 531.481385,
+      "mediana": 51.0,
+      "p90": 686.0,
+      "p99": 7091.0,
+      "max": 1136760,
+      "pct_com_uma_interacao": 4.9344
+    }
+  },
+  "cauda_longa_produtos": {
+    "top_1_pct_share": 50.6681,
+    "top_10_pct_share": 83.2224,
+    "itens_para_80_pct": 16226,
+    "pct_itens_para_80_pct": 7.8433,
+    "gini_produtos": 0.885578,
+    "gini_usuarios": 0.731749
+  },
+  "preco": {
+    "minimo": 0.0,
+    "maximo": 2574.07,
+    "media": 291.634802,
+    "pct_nulo": 0.0,
+    "pct_nao_positivo": 0.2335
+  },
+  "esquema": [
+    {
+      "coluna": "event_time",
+      "nulos": 0,
+      "pct_nulos": 0.0
+    },
+    {
+      "coluna": "event_type",
+      "nulos": 0,
+      "pct_nulos": 0.0
+    },
+    {
+      "coluna": "product_id",
+      "nulos": 0,
+      "pct_nulos": 0.0
+    },
+    {
+      "coluna": "category_id",
+      "nulos": 0,
+      "pct_nulos": 0.0
+    },
+    {
+      "coluna": "category_code",
+      "nulos": 35413780,
+      "pct_nulos": 32.2088
+    },
+    {
+      "coluna": "brand",
+      "nulos": 15341158,
+      "pct_nulos": 13.9528
+    },
+    {
+      "coluna": "price",
+      "nulos": 0,
+      "pct_nulos": 0.0
+    },
+    {
+      "coluna": "user_id",
+      "nulos": 0,
+      "pct_nulos": 0.0
+    },
+    {
+      "coluna": "user_session",
+      "nulos": 12,
+      "pct_nulos": 0.0
+    }
+  ],
+  "id_excede_32": false,
+  "limitacoes_conhecidas": [
+    "Feedback implícito e anonimizado: o evento `view` não registra a posição de impressão nem o que foi oferecido. Não há controle de exposição, logo qualquer correção por propensão é aproximada (propensão modelada), nunca um inverso de probabilidade exato.",
+    "Ausência de interação não é rejeição comprovada; os negativos são 'não observados'. A hipótese de amostragem negativa precisa ser explícita.",
+    "Duplicatas de linha integral não são contadas em 14 GB; a chave de deduplicação relevante é (usuário, item), medida aqui.",
+    "A cobertura temporal é limitada aos arquivos presentes; tendências e sazonalidade fora da janela ficam invisíveis ao profiling."
+  ]
+}

@@ -9,8 +9,11 @@
 #     preparacao_dados ──┬──> treinamento_modelo
 #                       └──> treinamento_ensemble
 #
-#     benchmark_sintetico  (ramo independente — base sintética reproduzível)
 #     benchmark_publico_sc_base_03  (ramo independente — base pública REAL)
+#
+#     perfil_sc_base_04             (ramo independente — log de eventos em escala)
+#
+#     benchmark_escala_sc_base_04   (ramo independente — régua blindada em escala)
 #
 # Cada estágio declara as dependências de código (scripts/config) e de dados,
 # garantindo que o DVC só re-execute o necessário quando algo mudar.
@@ -68,21 +71,6 @@ stages:
     outs:
       - models/ensemble/
 
-  benchmark_sintetico:
-    desc: "Benchmark de escala sobre base sintética rotulada (NeuMF + baselines + teto oracle)."
-    cmd: python -m src.scripts.benchmark_sintetico
-    deps:
-      - src/scripts/benchmark_sintetico.py
-      - src/config/synthetic_data.py
-      - src/config/model_utils.py
-      - src/config/mlflow_tracking.py
-      - src/config/paths.py
-    outs:
-      - dados/benchmark_sintetico.parquet
-    metrics:
-      - report/benchmark_sintetico_metricas.json:
-          cache: false
-
   benchmark_publico_sc_base_03:
     desc: "Benchmark sobre a base pública REAL sc_base_03 (NeuMF + baselines, sem teto oracle)."
     cmd: python -m src.scripts.benchmark_sc_base_03
@@ -100,4 +88,30 @@ stages:
       - dados/sc_base_03/benchmark_sc_base_03.parquet
     metrics:
       - report/benchmark_sc_base_03_metricas.json:
+          cache: false
+
+  perfil_sc_base_04:
+    desc: "Audita o log de eventos em escala de sc_base_04 em blocos (volume, tipos, cardinalidade, densidade, cauda longa, limitações)."
+    cmd: python -m src.scripts.perfil_sc_base_04
+    deps:
+      - src/scripts/perfil_sc_base_04.py
+      - src/config/paths.py
+      - dados/sc_base_04/2019-Oct.csv
+      - dados/sc_base_04/2019-Nov.csv
+    metrics:
+      - report/perfil_sc_base_04.json:
+          cache: false
+
+  benchmark_escala_sc_base_04:
+    desc: "Benchmark de escala sobre o log de eventos real sc_base_04 (baselines fortes + régua blindada com IC 95%)."
+    cmd: python -m src.scripts.benchmark_sc_base_04
+    deps:
+      - src/scripts/benchmark_sc_base_04.py
+      - src/config/avaliacao_ranking.py
+      - src/config/model_utils.py
+      - src/config/paths.py
+      - dados/sc_base_04/2019-Oct.csv
+      - dados/sc_base_04/2019-Nov.csv
+    metrics:
+      - report/benchmark_sc_base_04_metricas.json:
           cache: false

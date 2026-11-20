@@ -18,6 +18,8 @@ PROJECT_ROOT = get_project_root()
 DATA_DIR = PROJECT_ROOT / "dados"
 SC_BASE_01_DIR = DATA_DIR / "sc_base_01"
 SC_BASE_03_DIR = DATA_DIR / "sc_base_03"
+SC_BASE_04_DIR = DATA_DIR / "sc_base_04"
+SC_BASE_05_DIR = DATA_DIR / "sc_base_05"
 
 DADOS_BRUTOS = SC_BASE_01_DIR / "sc_base_01_bruto.csv"
 DADOS_TRATADOS = SC_BASE_01_DIR / "sc_base_01_tratado.parquet"

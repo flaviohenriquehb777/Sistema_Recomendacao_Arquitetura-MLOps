@@ -1,0 +1,210 @@
+{
+  "base": "sc_base_04",
+  "escala": {
+    "eventos": 109950743,
+    "usuarios": 5316649,
+    "produtos": 206876
+  },
+  "filtros": {
+    "min_eventos_item": 50,
+    "min_itens_usuario": 5,
+    "max_usuarios_coorte": 50000,
+    "usuarios_elegiveis": 2338236,
+    "usuarios_coorte": 50000,
+    "itens_catalogo": 105047
+  },
+  "protocolo": {
+    "split": "leave-last-out (último evento = teste; penúltimo = validação)",
+    "candidatos": "catálogo completo, com exclusão dos itens vistos",
+    "feedback": "implícito binário (todos os tipos de evento)",
+    "k": 10,
+    "n_bootstrap": 1000,
+    "semente": 42
+  },
+  "baselines": {
+    "janela_recencia_dias": 7,
+    "top_vizinhos_knn": 100,
+    "als_fatores": 32,
+    "als_iteracoes": 10,
+    "pesos_hibrido_escolhidos": {
+      "alpha_als": 0.5,
+      "beta_knn": 0.5
+    },
+    "alpha_als_sem_knn": 0.5,
+    "historico_pesos_validacao": {
+      "0.0,0.0": 0.019468774268823135,
+      "0.25,0.0": 0.045114611130318644,
+      "0.5,0.0": 0.04722049965058864,
+      "1.0,0.0": 0.046033996050749065,
+      "2.0,0.0": 0.04554195546549835,
+      "0.0,0.5": 0.05452392642095075,
+      "0.25,0.5": 0.0587774345261736,
+      "0.5,0.5": 0.059707280888707324,
+      "1.0,0.5": 0.05768987821962995,
+      "2.0,0.5": 0.05391746221196552,
+      "0.0,1.0": 0.052231450105134795,
+      "0.25,1.0": 0.05535320620492785,
+      "0.5,1.0": 0.05756163884594125,
+      "1.0,1.0": 0.05874616833222206,
+      "2.0,1.0": 0.0578740126139911,
+      "0.0,2.0": 0.051654462638861635,
+      "0.25,2.0": 0.05276131064604273,
+      "0.5,2.0": 0.0543003350296443,
+      "1.0,2.0": 0.05666031426278541,
+      "2.0,2.0": 0.05817068974594448
+    }
+  },
+  "metricas": {
+    "aleatorio": {
+      "ndcg@10": 4.156259305271552e-05,
+      "map@10": 2.4e-05,
+      "hit_rate@10": 0.0001,
+      "ndcg@10_ic": {
+        "media": 4.156259305271552e-05,
+        "ic_inferior": 1e-05,
+        "ic_superior": 8.003906482631785e-05
+      },
+      "map@10_ic": {
+        "media": 2.4e-05,
+        "ic_inferior": 4e-06,
+        "ic_superior": 4.866666666666666e-05
+      },
+      "num_usuarios": 50000,
+      "cobertura_catalogo": 0.0001047150323188668,
+      "novidade": 18.13236501989859,
+      "diversidade_categoria": 1.0,
+      "segundos": 189.05
+    },
+    "mais_populares": {
+      "ndcg@10": 0.041695356877864735,
+      "map@10": 0.030671285714285717,
+      "hit_rate@10": 0.07786,
+      "ndcg@10_ic": {
+        "media": 0.041695356877864735,
+        "ic_inferior": 0.04024673819371314,
+        "ic_superior": 0.04311806253301373
+      },
+      "map@10_ic": {
+        "media": 0.030671285714285717,
+        "ic_inferior": 0.029447211111111107,
+        "ic_superior": 0.031851047817460315
+      },
+      "num_usuarios": 50000,
+      "cobertura_catalogo": 0.00043789922606071567,
+      "novidade": 8.180205336448026,
+      "diversidade_categoria": 0.11144200000000004,
+      "segundos": 157.05
+    },
+    "recencia": {
+      "ndcg@10": 0.04017064780600972,
+      "map@10": 0.029480333333333334,
+      "hit_rate@10": 0.07548,
+      "ndcg@10_ic": {
+        "media": 0.04017064780600972,
+        "ic_inferior": 0.0387103932059043,
+        "ic_superior": 0.04150412672625968
+      },
+      "map@10_ic": {
+        "media": 0.029480333333333334,
+        "ic_inferior": 0.028330668253968253,
+        "ic_superior": 0.03065902579365079
+      },
+      "num_usuarios": 50000,
+      "cobertura_catalogo": 0.00039982103249021865,
+      "novidade": 8.311478693500883,
+      "diversidade_categoria": 0.19755800000000004,
+      "segundos": 4872.05
+    },
+    "item_knn": {
+      "ndcg@10": 0.10739786793451536,
+      "map@10": 0.08582262698412699,
+      "hit_rate@10": 0.17778,
+      "ndcg@10_ic": {
+        "media": 0.10739786793451536,
+        "ic_inferior": 0.10517288360685838,
+        "ic_superior": 0.1096523697851102
+      },
+      "map@10_ic": {
+        "media": 0.08582262698412699,
+        "ic_inferior": 0.08367935634920635,
+        "ic_superior": 0.08782245853174603
+      },
+      "num_usuarios": 50000,
+      "cobertura_catalogo": 0.4504269517454092,
+      "novidade": 14.115355181807189,
+      "diversidade_categoria": 0.261606,
+      "segundos": 113.89
+    },
+    "als": {
+      "ndcg@10": 0.09460283770838458,
+      "map@10": 0.07409467460317459,
+      "hit_rate@10": 0.1618,
+      "ndcg@10_ic": {
+        "media": 0.09460283770838458,
+        "ic_inferior": 0.09242902598410255,
+        "ic_superior": 0.09666440883362497
+      },
+      "map@10_ic": {
+        "media": 0.07409467460317459,
+        "ic_inferior": 0.07219393174603175,
+        "ic_superior": 0.0760339490079365
+      },
+      "num_usuarios": 50000,
+      "cobertura_catalogo": 0.01878206897864765,
+      "novidade": 10.583724108722958,
+      "diversidade_categoria": 0.22246400000000002,
+      "segundos": 153.34
+    },
+    "hibrido_popularity_first": {
+      "ndcg@10": 0.09471461416854689,
+      "map@10": 0.07437363492063491,
+      "hit_rate@10": 0.16138,
+      "ndcg@10_ic": {
+        "media": 0.09471461416854689,
+        "ic_inferior": 0.09250520279764313,
+        "ic_superior": 0.09680970017433191
+      },
+      "map@10_ic": {
+        "media": 0.07437363492063491,
+        "ic_inferior": 0.07238199404761904,
+        "ic_superior": 0.0762796353174603
+      },
+      "num_usuarios": 50000,
+      "cobertura_catalogo": 0.012622921168619761,
+      "novidade": 10.185827920526433,
+      "diversidade_categoria": 0.228196,
+      "segundos": 236.52
+    },
+    "hibrido_knn_als": {
+      "ndcg@10": 0.12565000676348698,
+      "map@10": 0.10053810317460318,
+      "hit_rate@10": 0.20766,
+      "ndcg@10_ic": {
+        "media": 0.12565000676348698,
+        "ic_inferior": 0.12321144999948593,
+        "ic_superior": 0.12798844669858403
+      },
+      "map@10_ic": {
+        "media": 0.10053810317460318,
+        "ic_inferior": 0.09832990337301586,
+        "ic_superior": 0.10268747876984127
+      },
+      "num_usuarios": 50000,
+      "cobertura_catalogo": 0.28217845345416814,
+      "novidade": 11.575490393786174,
+      "diversidade_categoria": 0.18958600000000003,
+      "segundos": 358.56
+    }
+  },
+  "comparacao": {
+    "melhor_baseline_ndcg": 0.10739786793451536,
+    "ganho_hibrido_sobre_melhor_baseline": 0.16994880047433214,
+    "ganho_als_sobre_populares": 1.2689058157122384,
+    "ganho_knn_sobre_populares": 1.5757752415720616
+  },
+  "limitacoes_conhecidas": [
+    "A coorte é uma amostra determinística de usuários elegíveis — necessária para o ranking do catálogo completo ser tratável.",
+    "Feedback implícito sem controle de exposição: correção por propensão é aproximada, nunca um inverso de probabilidade exato.",
+    "A ausência de interação é 'não observada', não rejeição comprovada."
+  ]
+}
