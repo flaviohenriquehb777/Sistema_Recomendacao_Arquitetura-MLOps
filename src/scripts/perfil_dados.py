@@ -23,7 +23,7 @@ from typing import Any
 import numpy as np
 import pandas as pd
 
-from src.config.paths import DADOS_BRUTOS, REPORTS_DIR
+from src.config.paths import DADOS_BRUTOS, REPORTS_DIR, exigir_dados_brutos
 
 COLUNA_PEDIDO = "Order ID"
 COLUNA_CLIENTE = "Customer ID"
@@ -46,7 +46,7 @@ PERFIL_JSON = REPORTS_DIR / "perfil_sc_base_01.json"
 
 def carregar_base() -> pd.DataFrame:
     """Lê a base bruta em CSV."""
-    return pd.read_csv(DADOS_BRUTOS)
+    return pd.read_csv(exigir_dados_brutos())
 
 
 def _arredondar(valor: float, casas: int = 6) -> float:

@@ -22,8 +22,17 @@ SC_BASE_03_DIR = DATA_DIR / "sc_base_03"
 DADOS_BRUTOS = SC_BASE_01_DIR / "sc_base_01_bruto.csv"
 DADOS_TRATADOS = SC_BASE_01_DIR / "sc_base_01_tratado.parquet"
 
-if not DADOS_BRUTOS.exists():
-    raise FileNotFoundError(f"Arquivo não encontrado: {DADOS_BRUTOS}")
+
+def exigir_dados_brutos() -> Path:
+    """Caminho do CSV bruto de `sc_base_01`, validado apenas no momento do uso.
+
+    A validação vive aqui — e não no import do módulo — para que `paths` possa
+    ser importado em ambientes sem os dados (CI, clone limpo), onde o bruto é
+    armazenado fora do git.
+    """
+    if not DADOS_BRUTOS.exists():
+        raise FileNotFoundError(f"Arquivo não encontrado: {DADOS_BRUTOS}")
+    return DADOS_BRUTOS
 
 
 MODELS_DIR = PROJECT_ROOT / "models"

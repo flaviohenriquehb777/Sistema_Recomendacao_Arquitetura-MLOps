@@ -16,7 +16,7 @@ Uso:
 import pandas as pd
 
 from src.config.auxiliares_ml import downcast_dataframe
-from src.config.paths import DADOS_BRUTOS, DADOS_TRATADOS
+from src.config.paths import DADOS_BRUTOS, DADOS_TRATADOS, exigir_dados_brutos
 
 # Valor aplicado pelo notebook original aos 'Postal Code' nulos.
 POSTAL_CODE_PADRAO = 5401
@@ -24,7 +24,7 @@ POSTAL_CODE_PADRAO = 5401
 
 def carregar_dados_brutos() -> pd.DataFrame:
     """Lê a base bruta em CSV."""
-    return pd.read_csv(DADOS_BRUTOS)
+    return pd.read_csv(exigir_dados_brutos())
 
 
 def tratar_dados(df: pd.DataFrame) -> pd.DataFrame:
