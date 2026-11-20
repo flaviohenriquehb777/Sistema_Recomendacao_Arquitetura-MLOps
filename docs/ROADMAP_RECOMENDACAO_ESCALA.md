@@ -1,11 +1,11 @@
 # Roadmap: Recomendação Personalizada em Escala
 
 **Início previsto:** 21/11/2026
-**Objetivo:** transformar o projeto em uma vitrine técnica de recomendação personalizada, reproduzível e preparada para servir modelos, sem alegar equivalência com sistemas comerciais da Amazon ou do Mercado Livre.
+**Objetivo:** transformar o projeto em uma vitrine técnica de recomendação personalizada — reprodutível, avaliada com baselines honestos e preparada para servir modelos — sem prometer escala que os dados ainda não sustentam.
 
 ## Política de nomenclatura das bases
 
-- Todas as bases são identificadas apenas por código: `sc_base_01`, `sc_base_02`, `sc_base_03`.
+- Todas as bases são identificadas apenas por código: `sc_base_01`, `sc_base_02`, `sc_base_03`, `sc_base_04`, `sc_base_05`.
 - Nenhum nome de origem, fornecedor ou competição aparece em código, nomes de arquivo/pasta, dados, notebooks, pipeline DVC, Docker ou README.
 - O vínculo código → fonte real e as licenças ficam registrados na memória do projeto, fora do repositório.
 - Dados brutos nunca são versionados no Git, enviados ao DVC remoto ou incluídos na imagem Docker.
@@ -13,12 +13,16 @@
 
 ## Estratégia de dados
 
-- **`sc_base_01`** — base real de varejo transacional; baseline didático e referência para demonstrar que o protocolo não força personalização quando ela não é sustentada pela validação.
-- **`sc_base_02`** — benchmark principal de escala: compras por cliente com atributos de artigo e de cliente. Uso restrito a fins não comerciais e pesquisa acadêmica; exige aceite das regras da competição na conta do usuário antes do download. Não publicar os dados, não incluí-los na imagem Docker e não enviar dados, pesos ou artefatos derivados para um remoto DVC sem confirmar que os termos permitem.
+- **`sc_base_01`** — base real de varejo transacional; **teste de fumaça de infraestrutura** (ETL, DVC, MLflow, SHAP, cold start). Pequena e esparsa demais para sustentar personalização: a validação escolhe `alpha = 0`, e a API responde em modo popularidade. Não é o modelo principal.
+- **`sc_base_02`** — reservada: benchmark de transações em escala; uso restrito a fins não comerciais e pesquisa acadêmica; exige aceite das regras da competição na conta do usuário antes do download. Não publicar os dados, não incluí-los na imagem Docker e não enviar dados, pesos ou artefatos derivados para um remoto DVC sem confirmar que os termos permitem.
 - **`sc_base_03`** — benchmark comportamental complementar: visualização, carrinho e compra ao longo de meses. Licença com cláusulas de uso não comercial e compartilhamento pela mesma licença; manter atribuição e respeitar as restrições de redistribuição.
+- **`sc_base_04`** — **benchmark principal de escala**: log de eventos de interação (`view`, `cart`, `purchase`) de uma loja multicategoria, em escala (~14 GB de CSV). É a base que sustenta a modelagem personalizada e a régua de avaliação reforçada.
+- **`sc_base_05`** — **domínio cruzado**: log de eventos de interação de outra categoria, para validar generalização do que for aprendido em `sc_base_04` e expor dependências de domínio.
 - **Bases de avaliação textual em escala** — fora do escopo inicial: avaliações não são registros completos de exposição ou compra, a escala aumenta bastante o custo e os direitos de uso precisam ser esclarecidos antes de qualquer publicação.
 
 Para uso comercial real, treinar e validar com dados próprios do cliente, obtidos com autorização. Bases públicas restritas servem como benchmarks de portfólio, não como dados de produção comercial.
+
+**Privacidade de feedback:** as bases de eventos são anonimizadas e não registram posição de impressão nem o que foi oferecido. Não há controle de exposição; portanto qualquer correção por propensão (IPS) é **aproximada** (propensão modelada), nunca um inverso de probabilidade exato. Isso é declarado como limitação em qualquer métrica derivada.
 
 ## Etapa transversal obrigatória — Entendimento e tratamento de dados
 
@@ -51,7 +55,7 @@ Aplica-se a **todas** as bases, antes de qualquer modelagem.
 
 **Status:** concluída (20/11/2026). Relatório reprodutível em `report/perfil_sc_base_01.json`, produzido pelo estágio DVC `perfil_dados` — 9.800 linhas, 793 clientes, 1.861 produtos, esparsidade 0,9934, top 10 % dos produtos concentrando 19,96 % das interações.
 
-**Decisão:** `sc_base_01` é o **baseline** do projeto, não o modelo principal da API. O serviço é agnóstico de base — `DATA_PATH` declara o parquet servido e `MODEL_VARIANT` declara o papel do conjunto (hoje `baseline`, exposto em `GET /health`). O modelo principal só será definido quando existir treino em `sc_base_02`/`sc_base_03` (Etapas 2–4); até lá o `alpha = 0,0` selecionado por validação mantém o modo `popularity` nesta base.
+**Decisão:** `sc_base_01` é **teste de fumaça de infraestrutura**, não o modelo principal da API. O serviço é agnóstico de base — `DATA_PATH` declara o parquet servido e `MODEL_VARIANT` declara o papel do conjunto (hoje `baseline`, exposto em `GET /health`). O modelo principal exige treino em `sc_base_04` (benchmark principal de escala); até lá o `alpha = 0,0` selecionado por validação mantém o modo `popularity` nesta base.
 
 **Higiene de dados:** o CSV bruto de `sc_base_01` deixou de ser versionado (passou a `dados/.gitignore`), cumprindo a política de dados brutos fora do Git. A validação de existência foi movida do import para o uso, para que o código seja importável em clone limpo.
 
@@ -85,10 +89,26 @@ Aplica-se a **todas** as bases, antes de qualquer modelagem.
 
 ### 5. Avaliação e decisão do modelo
 
-- Reportar NDCG@12, Recall@12, MAP/Hit Rate, cobertura de catálogo e métricas de diversidade/novidade.
+- Reportar NDCG@k, MAP@k e Hit-Rate@k no **corte padrão `k = 10`**, com intervalo de confiança 95 % por bootstrap sobre os usuários, além de cobertura de catálogo, novidade e diversidade de categoria.
 - Desagregar resultados por atividade do cliente, popularidade do artigo e cold start.
-- Comparar com todos os baselines no teste temporal intocado e calcular incerteza por bootstrap.
+- Comparar com **todos** os baselines fortes no teste intocado: mais-populares, recência, item-kNN (co-ocorrência truncada) e ALS implícito — tudo no **mesmo** protocolo (leave-last-out, catálogo completo, exclusão dos itens vistos).
 - Rejeitar ou revisar o modelo se o ganho não for consistente; não substituir resultado negativo por alpha forçado.
+
+A régua implementada vive em `src/config/avaliacao_ranking.py` (baselines escaláveis, IC por bootstrap e métricas de catálogo), com testes em `tests/test_avaliacao_ranking.py`.
+
+**Resultado medido em `sc_base_04`** (estágio `benchmark_escala_sc_base_04`, `report/benchmark_sc_base_04_metricas.json`; coorte de 50.000 usuários elegíveis, catálogo de 105.047 itens, leave-last-out, `k = 10`):
+
+| Política | NDCG@10 [IC 95 %] | Hit-Rate@10 | Cobertura |
+|:--|--:|--:|--:|
+| **Híbrido ALS + item-kNN (α = 0,5; β = 0,5)** | **0,1257** [0,1232; 0,1280] | 0,2077 | 0,282 |
+| item-kNN (co-ocorrência) | 0,1074 [0,1052; 0,1097] | 0,1778 | 0,450 |
+| híbrido popularity-first (α = 0,5, só ALS) | 0,0947 [0,0925; 0,0968] | 0,1614 | 0,013 |
+| ALS implícito | 0,0946 [0,0924; 0,0967] | 0,1618 | 0,019 |
+| mais-populares | 0,0417 [0,0402; 0,0431] | 0,0779 | 0,000 |
+| recência | 0,0402 [0,0387; 0,0415] | 0,0755 | 0,000 |
+| aleatório | ~0,0000 | 0,0001 | 0,000 |
+
+Leitura: a personalização **supera largamente a popularidade em escala** (+201 % do modelo final sobre os mais-populares). A régua primeiro revelou que o **item-kNN de co-ocorrência** superava o híbrido só-ALS (0,1074 vs. 0,0947); em resposta, o desenho foi corrigido para o **híbrido ALS + item-kNN**, com α e β escolhidos na validação, que agora **supera o melhor baseline isolado em +17 %**. Esse ciclo — medir contra o melhor baseline, revelar a fraqueza, redesenhar e medir de novo — é o que a régua blindada existe para forçar.
 
 **Critério de saída:** melhoria demonstrável sobre o melhor baseline, sem vazamento e sem degradação inaceitável de cobertura. Se não houver melhoria, registrar a conclusão e investigar dados/objetivo.
 
@@ -130,10 +150,13 @@ Aplica-se a **todas** as bases, antes de qualquer modelagem.
 
 ## Estado de partida
 
-- `sc_base_01`: a validação escolheu `alpha=0`; o modelo dessa base permanece baseline.
+- `sc_base_01`: a validação escolheu `alpha=0`; a base é **teste de fumaça de infraestrutura**, não o modelo principal.
 - `sc_base_03`: o benchmark existente reporta NDCG@7 de 0,0541 contra 0,0117 para popularidade, no recorte documentado.
+- `sc_base_04`: adquirida (log de eventos em escala, ~14 GB); profiling reprodutível (`perfil_sc_base_04`) e **benchmark de escala medido** (`benchmark_escala_sc_base_04`): em 50.000 usuários warm, o modelo final **híbrido ALS + item-kNN** atinge 0,1257 de NDCG@10 — acima do item-kNN (0,1074) e da popularidade (0,0417).
+- `sc_base_05`: adquirida (domínio cruzado); reservada para validação de generalização.
 - `sc_base_02`: ainda não está no projeto; depende de aceite das regras e de credenciais do usuário.
 - Correções locais recentes incluem normalização de espaço não separável, SHAP sobre o score efetivo de ranking e `ranking_mode` explícito.
-- A suíte local passou com **26 testes**; `ruff check .` e `black --check` (escopo do CI) também estão limpos. O rebuild Docker posterior a essas correções foi interrompido e continua pendente.
+- A suíte local passou com **36 testes**; `ruff check .` e `black --check` (escopo do CI) também estão limpos. O rebuild Docker posterior a essas correções foi interrompido e continua pendente.
+- O benchmark de base gerada foi **removido por completo** (dados, relatório, figura, notebook, estágio DVC e código morto associado).
 - A nomenclatura anônima das bases foi concluída e o histórico do Git foi reescrito, de modo que nenhum nome real de origem permanece nos commits, nos caminhos ou no conteúdo versionado.
 - Exposição residual conhecida: a ref `refs/pull/1/head` mantida pelo GitHub a partir de uma PR antiga ainda aponta para um commit de antes da reescrita.

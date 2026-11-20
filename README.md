@@ -1,7 +1,7 @@
 <div align="center">
 
 # Sistema de Recomendações
-## Base de Estudo `sc_base_01`
+## NeuMF + MLOps · Recomendação de Produtos
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE.md)
 [![Python 3.11](https://img.shields.io/badge/Python-3.11-blue.svg)](https://www.python.org/)
@@ -28,8 +28,8 @@
 - [Arquitetura do Modelo](#arquitetura-do-modelo)
 - [Processo de Desenvolvimento](#processo-de-desenvolvimento)
 - [Resultados (base real sc_base_01)](#resultados-base-real-sc_base_01)
-- [Benchmark de Escala (base sintética)](#benchmark-de-escala-base-sintética-rotulada)
 - [Benchmark em Base Pública Real (sc_base_03)](#benchmark-em-base-pública-real-sc_base_03)
+- [Benchmark de Escala (sc_base_04)](#benchmark-de-escala-sc_base_04)
 - [Explicabilidade (SHAP)](#explicabilidade-shap)
 - [Ambiente MLOps](#ambiente-mlops)
 - [Estrutura do Repositório](#estrutura-do-repositório)
@@ -80,13 +80,15 @@ Aprimorar a experiência de compra dos clientes por meio de recomendações alta
 
 ## Bases de Dados
 
-O projeto trabalha com bases identificadas **apenas por nome-código** — `sc_base_01`, `sc_base_02` e `sc_base_03` — para manter a imersão no projeto e isolar a análise de qualquer referência externa. Cada base passa pelas mesmas etapas de **entendimento e tratamento de dados** antes de alimentar o modelo (ver `docs/ROADMAP_RECOMENDACAO_ESCALA.md`).
+O projeto trabalha com bases identificadas **apenas por nome-código** — `sc_base_01` a `sc_base_05` — para manter a imersão no projeto e isolar a análise de qualquer referência externa. Cada base passa pelas mesmas etapas de **entendimento e tratamento de dados** antes de alimentar o modelo (ver `docs/ROADMAP_RECOMENDACAO_ESCALA.md`).
 
 | Código | Papel no projeto |
 |:--|:--|
-| `sc_base_01` | **Baseline** de transações de varejo — valida o sistema de produção (ETL, DVC, MLflow, SHAP, cold start). |
-| `sc_base_02` | **Base principal de escala** — destinada a sustentar personalização com volume real de interações. |
-| `sc_base_03` | **Base comportamental** (log de eventos) — sinal implícito real, complementar à `sc_base_01`. |
+| `sc_base_01` | **Teste de fumaça de infraestrutura** — transações de varejo, esparsa e de baixa cardinalidade; exercita o pipeline ponta a ponta (ETL, DVC, MLflow, SHAP, cold start). |
+| `sc_base_02` | **Reservada** — benchmark de transações em escala; exige aceite de regras na conta do usuário antes do download. |
+| `sc_base_03` | **Benchmark real de comportamento** — log de eventos (`view`, `addtocart`, `transaction`). |
+| `sc_base_04` | **Benchmark principal de escala** — eventos de interação (`view`, `cart`, `purchase`) de uma loja multicategoria. |
+| `sc_base_05` | **Domínio cruzado** — eventos de interação de outra categoria, para validar generalização. |
 
 Na etapa de preparação da `sc_base_01` (`src/scripts/preparar_dados.py`) são aplicados: remoção de valores nulos, correção de tipos (`dtypes`) e *downcast* para reduzir o uso de memória. O resultado é persistido em **Parquet** (`dados/sc_base_01/sc_base_01_tratado.parquet`) para leitura eficiente.
 
@@ -148,7 +150,6 @@ O desenvolvimento está documentado em notebooks executáveis que **importam o p
 | `05_SHAP_Avancado.ipynb` | SHAP avançado + **verificação independente** por permutação. |
 | `06_777_Otimizacao_Avancada_Modelo.ipynb` | Comparação de configurações (dimensão, dropout, L2, lr). |
 | `07_777_Modelo_Final_Otimizado.ipynb` | Treino final, escolha de `alpha`, registro no MLflow e recomendações. |
-| `08_777_Benchmark_Escala_Sintetico.ipynb` | Benchmark de escala sobre base **sintética rotulada**: baselines e teto "oracle". |
 
 </div>
 
@@ -199,53 +200,13 @@ A configuração **regularizado** venceu por NDCG@7 de **validação** (critéri
 
 </div>
 
-**Leitura sênior dos resultados.** Nesta base esparsa de baixa cardinalidade, o *baseline* **mais-populares** é o sinal mais forte e o sinal neural **puro não o supera**; por isso o `alpha` da validação convergiu para `0,0`, degenerando o híbrido no recomendador popular. Isso **não é um defeito** — é o resultado correto de um protocolo de seleção que prioriza a validação e evita *cherry-picking* no teste. O sistema **entrega valor** (supera largamente o aleatório: Hit-Rate@7 ≈ 0,0052 vs. 0,0038) e a infraestrutura está pronta para, com mais dados, o sinal neural passar a dominar. A quantificação desse comportamento é evidenciada em [Explicabilidade (SHAP)](#explicabilidade-shap); a prova de que o **método** supera a popularidade quando há escala de dados está em [Benchmark de Escala](#benchmark-de-escala-base-sintética-rotulada).
-
-## Benchmark de Escala (base sintética rotulada)
-
-> **Aviso de honestidade.** A base desta seção é **100 % sintética** e **reproduzível** (`seed=42`, `src/config/synthetic_data.py`). Ela **não representa dados reais de nenhuma empresa**. O objetivo é demonstrar que **o método e a arquitetura recuperam preferência latente quando ela existe** — algo que a base pública pequena (seção anterior) não permite medir.
-
-A base pública *sc_base_01* é pequena e esparsa; nessa escala, o *baseline* de *mais-populares* é o sinal mais forte e **nenhum** modelo neural o supera de forma estável. Um recomendador "nível produção" só **demonstra personalização** quando existe sinal colaborativo recuperável. Como dados reais de clientes são protegidos por privacidade (o que se publica em portfólio é anonimizado/sintético), construímos um **benchmark sintético** com estrutura latente real e rodamos **o mesmo código do pipeline**.
-
-<div align="center">
-
-| Métrica da base sintética | Valor |
-|:--|--:|
-| Interações | 66.020 |
-| Clientes / Produtos | 3.000 / 990 |
-| Categorias / Subcategorias | 8 / 40 |
-| Itens por cliente (média) | 22,0 |
-| Densidade da matriz cliente × produto | 2,22 % |
-
-</div>
-
-Métricas de **teste** (*leave-last-out*, catálogo completo, `k = 7`):
-
-<div align="center">
-
-| Política | NDCG@7 | MAP@7 | HitRate@7 | Precision@7 | Recall@7 | F1@7 |
-|:--|--:|--:|--:|--:|--:|--:|
-| **NeuMF (modelo final)** | **0,1141** | **0,0882** | **0,1967** | **0,0281** | **0,1967** | **0,0492** |
-| Híbrido popularity-first (α = 1,0) | 0,1085 | 0,0835 | 0,1877 | 0,0268 | 0,1877 | 0,0469 |
-| Mais-populares (*baseline*) | 0,0215 | 0,0160 | 0,0390 | 0,0056 | 0,0390 | 0,0098 |
-| Teto "oracle" (afinidade latente) | 0,1400 | 0,1060 | 0,2483 | 0,0355 | 0,2483 | 0,0621 |
-| Aleatório (esperança) | — | — | 0,0072 | 0,0010 | 0,0072 | — |
-
-</div>
-
-> O **teto "oracle"** ranqueia pela afinidade latente verdadeira — é um **limite superior** (não um modelo implantável) e serve para medir quanto do potencial é recuperável. O símbolo **—** indica métricas sem forma fechada no *baseline* aleatório.
-
-**Leitura sênior.** Com sinal colaborativo real, a **NeuMF supera o *baseline* de popularidade em +431,7 % de NDCG@7** e captura **81,5 % do teto recuperável** — ou seja, **não é um recomendador de "mais vendidos"**: ele separa preferências por cliente. A escolha do modelo final é feita **por validação** (`NDCG@7` de validação = 0,10769); em escala, a validação seleciona a **NeuMF pura**, porque o *prior* explícito de popularidade apenas dilui a personalização que a rede já aprendeu.
-
-**Por que as duas bases diferem?** O gargalo da base real é **dado, não código**. O mesmo pipeline, com o mesmo protocolo e a mesma arquitetura, mostra personalização robusta quando há interações suficientes. A diferença operacional é a **regularização**: na base real (minúscula), `L2` + *dropout* fortes são **necessários** para não decorar o treino; em escala, essa mesma regularização **sufoca** a personalização.
-
-> **Reprodutibilidade:** notebook [`08_777_Benchmark_Escala_Sintetico.ipynb`](notebooks/08_777_Benchmark_Escala_Sintetico.ipynb) · script `python -m src.scripts.benchmark_sintetico` · métricas em [`report/benchmark_sintetico_metricas.json`](report/benchmark_sintetico_metricas.json) · figura em `report/figuras/benchmark_escala_ndcg.png`.
+**Leitura sênior dos resultados.** Nesta base esparsa de baixa cardinalidade, o *baseline* **mais-populares** é o sinal mais forte e o sinal neural **puro não o supera**; por isso o `alpha` da validação convergiu para `0,0`, degenerando o híbrido no recomendador popular. Isso **não é um defeito** — é o resultado correto de um protocolo de seleção que prioriza a validação e evita *cherry-picking* no teste. O sistema **entrega valor** (supera largamente o aleatório: Hit-Rate@7 ≈ 0,0052 vs. 0,0038) e a infraestrutura está pronta para, com mais dados, o sinal neural passar a dominar. A quantificação desse comportamento é evidenciada em [Explicabilidade (SHAP)](#explicabilidade-shap); a prova de que o **método** supera a popularidade quando há escala de dados está em [Benchmark em Base Pública Real (sc_base_03)](#benchmark-em-base-pública-real-sc_base_03).
 
 ## Benchmark em Base Pública Real (sc_base_03)
 
 > **Aviso de honestidade.** A base desta seção é **real** — o *log de eventos* público da **sc_base_03**, com *feedback* implícito de verdade (`view`, `addtocart`, `transaction`). Ela é **anonimizada** (sem nomes de produto/cliente) e recebe **filtros explícitos de tratabilidade** (itens/usuários relevantes + amostra determinística, `src/config/sc_base_03_data.py`). Por ser dado real, **não existe "teto oracle"** (não há fator latente verdadeiro conhecido).
 
-A base sintética prova que o método funciona quando **construímos** o sinal — o que é, em alguma medida, circular. A sc_base_03 fecha essa lacuna: é um e-commerce **real**, com sinal implícito que o sistema não controla. Aqui o mesmo pipeline é executado sobre dado real de outra origem, sem qualquer ajuste de código.
+A sc_base_03 é um e-commerce **real**, com sinal implícito que o sistema não controla. Aqui o mesmo pipeline é executado sobre dado real de outra origem, sem qualquer ajuste de código.
 
 <div align="center">
 
@@ -277,6 +238,49 @@ Métricas de **teste** (*leave-last-out*, catálogo completo, `k = 7`):
 
 **Reprodutibilidade:** script `python -m src.scripts.benchmark_sc_base_03` (estágio DVC `benchmark_publico_sc_base_03`) · métricas em [`report/benchmark_sc_base_03_metricas.json`](report/benchmark_sc_base_03_metricas.json). Os CSVs brutos da base (`dados/sc_base_03/`, ~1 GB) são obtidos na etapa 2 do roadmap (ver `docs/ROADMAP_RECOMENDACAO_ESCALA.md`) e **não são versionados**.
 
+## Benchmark de Escala (sc_base_04)
+
+> **Aviso de honestidade.** A `sc_base_04` é **real**: ~14 GB de log de eventos implícitos (`view`, `cart`, `purchase`) de uma loja multicategoria. Nenhum número abaixo é estimado — todos são medidos no bruto por um estágio DVC reprodutível (`benchmark_escala_sc_base_04`).
+
+O benchmark lê o log **uma única vez** em blocos, aplica os filtros de tratabilidade e avalia **baselines fortes** na **régua blindada** (`src/config/avaliacao_ranking.py`): leave-last-out, catálogo completo com exclusão dos itens vistos, `k = 10`, e **IC 95 % por bootstrap** sobre os usuários.
+
+> **Nota sobre o corte `k`.** São dois cortes independentes, por desenho: o **pipeline NeuMF** (sc_base_01 e sc_base_03) usa `k = 7` — o mesmo default do serviço de inferência —, enquanto o **benchmark de escala** (sc_base_04) adota `k = 10`, propositalmente mais profundo, para expor de forma mais dura a separação entre personalização e popularidade. Os valores `k = 7` e `k = 10` **não são comparáveis entre si**.
+
+<div align="center">
+
+| Base sc_base_04 (após filtros) | Valor |
+|:--|--:|
+| Eventos lidos | 109.950.743 |
+| Usuários / Produtos (bruto) | 5.316.649 / 206.876 |
+| Coorte avaliada | 50.000 usuários (de 2.338.236 elegíveis) |
+| Itens no catálogo candidato | 105.047 |
+| Interações de treino na coorte | 1.004.004 |
+| Filtros | itens ≥ 50 eventos · usuários ≥ 5 itens · coorte determinística de 50.000 |
+
+</div>
+
+Métricas de **teste** (*leave-last-out*, catálogo completo, `k = 10`, IC 95 % por bootstrap):
+
+<div align="center">
+
+| Política | NDCG@10 [IC 95 %] | MAP@10 | Hit-Rate@10 | Cobertura | Novidade |
+|:--|--:|--:|--:|--:|--:|
+| **Híbrido ALS + item-kNN (α = 0,5; β = 0,5) — modelo final** | **0,1257** [0,1232; 0,1280] | 0,1005 | 0,2077 | 0,282 | 11,58 |
+| item-kNN (co-ocorrência) | 0,1074 [0,1052; 0,1097] | 0,0858 | 0,1778 | 0,450 | 14,12 |
+| Híbrido popularity-first (α = 0,5) | 0,0947 [0,0925; 0,0968] | 0,0744 | 0,1614 | 0,013 | 10,19 |
+| ALS implícito | 0,0946 [0,0924; 0,0967] | 0,0741 | 0,1618 | 0,019 | 10,58 |
+| Mais-populares (*baseline*) | 0,0417 [0,0402; 0,0431] | 0,0307 | 0,0779 | 0,000 | 8,18 |
+| Recência | 0,0402 [0,0387; 0,0415] | 0,0295 | 0,0755 | 0,000 | 8,31 |
+| Aleatório | ~0,0000 | ~0,0000 | 0,0001 | 0,000 | 18,13 |
+
+</div>
+
+**Leitura sênior.** Em escala real, a **personalização vence com folga**: o modelo final (híbrido ALS + item-kNN) atinge **0,1257** de NDCG@10 — **+201 %** sobre os mais-populares e **+17 %** sobre o melhor baseline isolado (item-kNN, 0,1074). Quase **1 em cada 4,8** usuários recebe o item relevante no top-10 (Hit-Rate@10 = 20,8 %, contra 7,8 % da popularidade e 0,01 % do aleatório). Os intervalos de confiança **não se sobrepõem** entre o modelo final e qualquer baseline — o ganho é estatisticamente sólido, não ruído.
+
+**Como se chegou ao modelo final.** A régua blindada primeiro **expôs** que o item-kNN de co-ocorrência superava o híbrido popularity-first baseado em ALS (0,1074 vs. 0,0947, ≈ +12 %). Em vez de maquiar o resultado, o desenho foi corrigido: o **híbrido ALS + item-kNN** soma o prior de popularidade ao sinal latente (α) e à co-ocorrência (β), com **os dois pesos escolhidos na validação** (α = 0,5; β = 0,5). O resultado é o melhor dos dois mundos: NDCG@10 de **0,1257**, acima do item-kNN puro, preservando boa cobertura (28,2 % do catálogo). Esse ciclo — **medir contra o melhor baseline → revelar a fraqueza → redesenhar → medir de novo** — é o que caracteriza uma avaliação de nível sênior.
+
+**Reprodutibilidade:** script `python -m src.scripts.benchmark_sc_base_04` (estágio DVC `benchmark_escala_sc_base_04`) · métricas em [`report/benchmark_sc_base_04_metricas.json`](report/benchmark_sc_base_04_metricas.json). Os CSVs brutos (`dados/sc_base_04/`, ~14 GB) **não são versionados**.
+
 ## Explicabilidade (SHAP)
 
 O SHAP é aplicado ao *score* da NeuMF para medir a contribuição de cada entrada. Como a rede é multi-entrada (IDs), a análise é feita sobre os quatro campos (cliente, produto, categoria, subcategoria). Os resultados (notebook `05`) são consistentes entre **três evidências independentes**:
@@ -300,15 +304,17 @@ As três colunas convergem: **categoria e subcategoria** concentram a informaç�
 O `pyproject.toml` é a **fonte única** do ambiente; o `uv.lock` fixa todas as versões resolvidas (reprodutibilidade total) e o `requirements.txt` é **exportado** do lock para compatibilidade com ferramentas legadas.
 
 ### DVC + DagsHub — versionamento de dados e modelos
-O *remote* do DVC é o **DagsHub deste projeto** (`https://dagshub.com/flaviohenriquehb777/Sistema_Recomendacao_Arquitetura-MLOps.dvc`). O pipeline é declarado em `dvc.yaml` com cinco estágios:
+O *remote* do DVC é o **DagsHub deste projeto** (`https://dagshub.com/flaviohenriquehb777/Sistema_Recomendacao_Arquitetura-MLOps.dvc`). O pipeline é declarado em `dvc.yaml` com sete estágios:
 
 | Estágio | Comando | Saídas versionadas |
 |:--|:--|:--|
+| `perfil_dados` | `python -m src.scripts.perfil_dados` | `report/perfil_sc_base_01.json` |
 | `preparacao_dados` | `python -m src.scripts.preparar_dados` | `dados/sc_base_01/sc_base_01_tratado.parquet` |
 | `treinamento_modelo` | `python -m src.scripts.otimizacao_modelo` | `models/best_model_recomendacao_otimizado.keras`, `models/hybrid_config_otimizado.pkl`, `models/*_encoder_otimizado.pkl` |
 | `treinamento_ensemble` | `python -m src.scripts.modelo_ensemble` | `models/ensemble/` |
-| `benchmark_sintetico` | `python -m src.scripts.benchmark_sintetico` | `dados/benchmark_sintetico.parquet` |
 | `benchmark_publico_sc_base_03` | `python -m src.scripts.benchmark_sc_base_03` | `dados/sc_base_03/benchmark_sc_base_03.parquet` |
+| `perfil_sc_base_04` | `python -m src.scripts.perfil_sc_base_04` | `report/perfil_sc_base_04.json` |
+| `benchmark_escala_sc_base_04` | `python -m src.scripts.benchmark_sc_base_04` | `report/benchmark_sc_base_04_metricas.json` |
 
 ### MLflow — tracking e model registry
 - Backend **local em SQLite** (`sqlite:///<raiz>/mlflow.db`) por padrão — 100 % offline e recomendado pelo MLflow 3 (o antigo *file store* `mlruns/` está em *maintenance mode*).
@@ -322,27 +328,31 @@ Pipeline em `.github/workflows/ci.yml` com `uv sync --frozen`, **Ruff** (lint), 
 
 ```
 Sistema_Recomendacao_Arquitetura-MLOps/
-├── dados/                     # Uma pasta por base (sc_base_01, sc_base_03) — DVC
+├── dados/                     # Uma pasta por base (sc_base_01, sc_base_03..05) — DVC
 ├── models/                    # Modelo, encoders e config do híbrido — DVC
-├── notebooks/                 # 01..08 — narrativa executável do projeto
+├── notebooks/                 # 01..07 — narrativa executável do projeto
 ├── src/
 │   ├── config/
 │   │   ├── model_utils.py     # NeuMF, híbrido, métricas de ranking, baselines
-│   │   ├── mlflow_tracking.py # Setup do MLflow (SQLite/DagsHub) e registro
+│   │   ├── avaliacao_ranking.py # Régua de avaliação (métricas por usuário, IC 95%, baselines escaláveis)
 │   │   ├── paths.py           # Caminhos canônicos do projeto
-│   │   ├── synthetic_data.py  # Gerador de base sintética (benchmark de escala)
 │   │   ├── sc_base_03_data.py # Preparo da base pública sc_base_03 (benchmark real)
-│   │   └── auxiliares*.py     # Utilitários de dados/plot
+│   │   ├── auxiliares_ml.py   # Utilitários de preparação de dados (downcast)
+│   │   ├── mlflow_tracking.py # Setup do MLflow (SQLite/DagsHub) e registro
+│   │   ├── dagshub_config.py  # Integração DagsHub ↔ MLflow
+│   │   └── experiment_tracker.py # Registro de experimentos
 │   └── scripts/
+│       ├── perfil_dados.py        # Auditoria de qualidade da base bruta
+│       ├── perfil_sc_base_04.py   # Auditoria do log de eventos em escala (sc_base_04)
 │       ├── preparar_dados.py      # CSV → Parquet tratado
 │       ├── otimizacao_modelo.py   # Treino do híbrido + métricas + MLflow
 │       ├── modelo_ensemble.py     # Ensemble (estágio complementar)
-│       ├── benchmark_sintetico.py # Benchmark de escala (base sintética)
-│       └── benchmark_sc_base_03.py # Benchmark em base pública real (sc_base_03)
+│       ├── benchmark_sc_base_03.py # Benchmark em base pública real (sc_base_03)
+│       └── benchmark_sc_base_04.py # Benchmark de escala (sc_base_04) com a régua blindada
 ├── serving/                   # Serviço de inferência (FastAPI): app, service, schemas
 ├── tests/                     # pytest (utilidades do modelo, sistema e API)
-├── report/                    # Figuras SHAP/benchmark e relatório PDF
-├── docs/                      # Guias (OPTIMIZATION_GUIDE.md, SYNC_GUIDE.md)
+├── report/                    # Figuras SHAP e métricas dos benchmarks (JSON)
+├── docs/                      # Guias (OPTIMIZATION_GUIDE.md, SYNC_GUIDE.md, ROADMAP_RECOMENDACAO_ESCALA.md)
 ├── .github/workflows/ci.yml   # CI/CD
 ├── Dockerfile · .dockerignore # Empacotamento do serviço (multi-stage, non-root)
 ├── dvc.yaml · .dvc/           # Pipeline e remote DagsHub
@@ -394,11 +404,11 @@ uv run mlflow ui --backend-store-uri sqlite:///mlflow.db
 uv run python -m pytest tests/ -v
 ```
 
-A suíte cobre as utilidades do modelo (criação da NeuMF, prior de popularidade, combinação de scores, baselines), o comportamento do sistema de recomendação e a **API de inferência** (`tests/test_api.py`, com recomendador sintético — não depende dos artefatos do DVC).
+A suíte cobre as utilidades do modelo (criação da NeuMF, prior de popularidade, combinação de scores, baselines), o comportamento do sistema de recomendação e a **API de inferência** (`tests/test_api.py`, com uma fixture mínima — não depende dos artefatos do DVC).
 
 ## Serviço de Inferência (API)
 
-O modelo treinado é exposto como um serviço REST de **referência** (`serving/`), pronto para ser empacotado e entregue a um time de produção. O serviço é **agnóstico de base**: a base servida é declarada em `DATA_PATH` (ex.: `sc_base_01`) e o papel do conjunto em `MODEL_VARIANT` — o conjunto entregue hoje é o de `sc_base_01`, rotulado como **`baseline`**, não como modelo principal da API.
+O modelo treinado é exposto como um serviço REST de **referência** (`serving/`), pronto para ser empacotado e entregue a um time de produção. O serviço é **agnóstico de base**: a base servida é declarada em `DATA_PATH` (ex.: `sc_base_01`) e o papel do conjunto em `MODEL_VARIANT` — o conjunto entregue hoje é o de `sc_base_01`, rotulado como **`baseline`** (teste de fumaça de infraestrutura), não como modelo principal da API.
 
 - **`GET /health`** — estado do serviço, base servida (`base_code`), papel do conjunto (`variant`) e artefatos carregados;
 - **`POST /recommend`** — top-k com `ranking_mode` explícito (`popularity` ou `hybrid`) e **SHAP aditivo sobre o score efetivamente usado no ranking** (cliente, produto, categoria, subcategoria). Clientes sem histórico (*cold start*) recebem o *fallback* por popularidade, com `cold_start = true` e explicação vazia. O `alpha` é selecionado por validação; nesta base sc_base_01, o modo atual é `popularity`.
@@ -424,7 +434,7 @@ docker run --rm -p 8000:8000 sistema-recomendacao:latest
 ```bash
 curl -X POST http://localhost:8000/recommend \
   -H "Content-Type: application/json" \
-  -d '{"customer_name": "Claire Gute", "top_k": 7, "explain": true}'
+  -d '{"customer_name": "Cliente Exemplo", "top_k": 7, "explain": true}'
 ```
 
 A documentação interativa (OpenAPI/Swagger) fica em <http://localhost:8000/docs>.
@@ -437,7 +447,7 @@ A documentação interativa (OpenAPI/Swagger) fica em <http://localhost:8000/doc
 - **Reprodutibilidade:** todas as funções usam sementes fixas (`RANDOM_SEED = 42`), o ambiente é congelado pelo `uv.lock` e os artefatos são versionados pelo DVC.
 - **Credenciais isoladas:** o rastreamento usa variáveis **próprias do projeto** para não herdar configuração de outros repositórios.
 - **Limitação honesta:** o desempenho é limitado pelo tamanho e pela esparsidade da base; o pipeline de ranking, a metodologia de avaliação e a explicabilidade estão prontos para escalar com mais dados.
-- **Três bases, três papéis:** a base **real** (`sc_base_01`) valida o **sistema de produção** (ETL, DVC, MLflow, SHAP, cold start) e expõe sua limitação honesta; o **benchmark sintético rotulado** valida o **método em escala** (+431,7 % de NDCG@7 sobre a popularidade); e o **benchmark em base pública real (`sc_base_03`)** prova que o **mesmo pipeline generaliza para dado real de outra origem** (+363,5 % de NDCG@7 sobre a popularidade, com personalização plena `α = 1,0`).
+- **Bases e papéis:** `sc_base_01` é o **teste de fumaça de infraestrutura** (ETL, DVC, MLflow, SHAP, cold start) e expõe sua limitação honesta; `sc_base_03` prova que o **mesmo pipeline generaliza para dado real de outra origem** (+363,5 % de NDCG@7 sobre a popularidade, com personalização plena `α = 1,0`); `sc_base_04` é o **benchmark principal de escala** — em 109,95 milhões de eventos, o modelo final (híbrido ALS + item-kNN) atinge NDCG@10 de 0,1257, **+201 % sobre a popularidade** e **+17 % sobre o melhor baseline isolado** (ver [Benchmark de Escala (sc_base_04)](#benchmark-de-escala-sc_base_04)); `sc_base_05` é o **domínio cruzado**, reservado para validar generalização.
 
 ## Licença
 
