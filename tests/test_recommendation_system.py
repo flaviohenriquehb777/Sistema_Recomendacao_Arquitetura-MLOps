@@ -133,11 +133,13 @@ class TestModelIntegration(unittest.TestCase):
         # Verificar se as pastas necessárias existem
         project_root = os.path.join(os.path.dirname(__file__), '..')
         
+        # `models/` não entra na lista: é um diretório de artefatos gerado em
+        # tempo de execução (criado por src/config/paths.py e populado pelo DVC),
+        # ausente em um clone limpo por definição.
         expected_dirs = [
             'src',
             'src/config',
             'src/scripts',
-            'models',
             'notebooks',
             'tests'
         ]
