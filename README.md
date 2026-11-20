@@ -361,7 +361,7 @@ Sistema_Recomendacao_Arquitetura-MLOps/
 
 ## Instalação e Uso
 
-Pré-requisitos: **Python 3.11**, **uv** (instalação: <https://docs.astral.sh/uv/>) e Git.
+Pré-requisitos: **Python 3.11**, **uv** (instalação: <https://docs.astral.sh/uv/>) e Git. O *remote* DVC/DagsHub deste projeto é **privado**, logo o `dvc pull` exige um **token do DagsHub** com acesso ao repositório.
 
 ```bash
 # 1. Clonar o repositório
@@ -371,14 +371,25 @@ cd Sistema_Recomendacao_Arquitetura-MLOps
 # 2. Criar o ambiente a partir do lock (reprodutível)
 uv sync --frozen
 
-# 3. Baixar dados e modelos versionados (DVC/DagsHub)
-uv run dvc pull
-
-# 4. Configurar credenciais (opcional, para DagsHub/MLflow remoto)
+# 3. Configurar credenciais (obrigatório para o DVC — o remote DagsHub é privado)
 cp .env.example .env      # preencha DAGSHUB_USER_TOKEN
+
+# 4. Autenticar o DVC (grava em .dvc/config.local, ignorado pelo Git) e baixar dados/modelos
+uv run dvc remote modify dagshub --local auth basic
+uv run dvc remote modify dagshub --local user <DAGSHUB_REPO_OWNER>
+uv run dvc remote modify dagshub --local password <DAGSHUB_USER_TOKEN>
+uv run dvc pull
 ```
 
-**Reproduzir o pipeline** (gera dados tratados, treina e salva os artefatos):
+> Sem token válido o `dvc pull` responde `401 Unauthorized`. As credenciais ficam em `.dvc/config.local`, que nunca é versionado.
+
+**Reproduzir o pipeline.** O ramo da `sc_base_01` roda ponta a ponta com os dados versionados:
+
+```bash
+uv run dvc repro perfil_dados preparacao_dados treinamento_modelo treinamento_ensemble
+```
+
+Os estágios `benchmark_publico_sc_base_03`, `perfil_sc_base_04` e `benchmark_escala_sc_base_04` dependem das bases externas `sc_base_03` (~1 GB) e `sc_base_04` (~14 GB), que **não são versionadas**. Com esses arquivos presentes em `dados/sc_base_03/` e `dados/sc_base_04/` (obtenção manual conforme `docs/ROADMAP_RECOMENDACAO_ESCALA.md`), o pipeline completo roda com:
 
 ```bash
 uv run dvc repro
