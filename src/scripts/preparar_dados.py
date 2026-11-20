@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 """
 Estágio de preparação de dados do pipeline DVC.
 

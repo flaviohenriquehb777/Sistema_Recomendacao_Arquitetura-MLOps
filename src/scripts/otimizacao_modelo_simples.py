@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 """
 Script simplificado para otimização avançada do modelo de recomendação.
 Implementa técnicas avançadas para maximizar a performance do modelo sem MLflow.

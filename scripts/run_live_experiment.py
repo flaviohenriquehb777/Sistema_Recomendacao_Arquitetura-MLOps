@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 """
 Script para executar um experimento ao vivo com tracking MLflow
 """

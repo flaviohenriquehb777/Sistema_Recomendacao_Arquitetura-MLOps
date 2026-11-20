@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 """
 Benchmark sobre a base **sc_base_03** (e-commerce real, feedback implícito
 anonimizado) — roda o pipeline de recomendação REAL e reporta métricas reais.

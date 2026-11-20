@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 """
 Script para criar modelo ensemble combinando diferentes arquiteturas de recomendação.
 Implementa múltiplas abordagens e combina suas predições para maximizar a performance.

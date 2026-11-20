@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 """
 Módulo para tracking de experimentos no DagsHub/MLflow
 """

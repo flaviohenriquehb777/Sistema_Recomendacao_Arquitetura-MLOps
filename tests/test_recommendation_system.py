@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 """
 Testes para o sistema de recomendação
 """

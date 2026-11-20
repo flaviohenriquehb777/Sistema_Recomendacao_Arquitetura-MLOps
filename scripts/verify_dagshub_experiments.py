@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 """
 Script para verificar se os experimentos estão aparecendo no DagsHub
 """

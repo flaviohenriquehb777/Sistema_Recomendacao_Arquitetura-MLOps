@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 """
 Configuração para integração com DagsHub e MLflow
 """

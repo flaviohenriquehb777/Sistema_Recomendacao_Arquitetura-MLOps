@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 """
 Benchmark de **escala** — roda o pipeline de recomendação REAL sobre uma base
 **sintética** (ver ``src/config/synthetic_data.py``) e reporta métricas reais.

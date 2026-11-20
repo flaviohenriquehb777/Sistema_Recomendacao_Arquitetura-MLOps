@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 """
 Script para popular o MLflow com experimentos históricos dos modelos
 """
